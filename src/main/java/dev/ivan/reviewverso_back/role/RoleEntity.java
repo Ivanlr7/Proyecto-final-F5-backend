@@ -1,5 +1,7 @@
 package dev.ivan.reviewverso_back.role;
 
+import dev.ivan.reviewverso_back.user.UserEntity;
+
 import java.util.Set;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,6 +12,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
