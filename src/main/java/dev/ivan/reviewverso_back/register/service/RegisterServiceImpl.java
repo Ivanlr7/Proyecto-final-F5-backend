@@ -2,6 +2,7 @@
 package dev.ivan.reviewverso_back.register.service;
 
 import dev.ivan.reviewverso_back.register.dto.*;
+import dev.ivan.reviewverso_back.register.exceptions.RegisterIllegalArgument;
 import dev.ivan.reviewverso_back.user.UserEntity;
 import dev.ivan.reviewverso_back.user.UserRepository;
 import dev.ivan.reviewverso_back.profile.ProfileEntity;
@@ -28,11 +29,11 @@ public class RegisterServiceImpl implements RegisterService {
 	public RegisterResponseDTO register(RegisterRequestDTO request) {
 	
 		if (userRepository.findByEmail(request.email()).isPresent()) {
-			throw new IllegalArgumentException("El email ya está registrado");
+			throw new RegisterIllegalArgument("El email ya está registrado");
 		}
 
 		if (userRepository.findByUserName(request.userName()).isPresent()) {
-			throw new IllegalArgumentException("El nombre de usuario ya está registrado");
+			throw new RegisterIllegalArgument("El nombre de usuario ya está registrado");
 		}
 
 		// Hasheo de roles
@@ -43,7 +44,7 @@ public class RegisterServiceImpl implements RegisterService {
 		if (request.roles() != null) {
 			for (String roleName : request.roles()) {
 				RoleEntity role = roleRepository.findByName(roleName)
-						.orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + roleName));
+						.orElseThrow(() -> new RegisterIllegalArgument("Rol no encontrado: " + roleName));
 				roles.add(role);
 			}
 		}

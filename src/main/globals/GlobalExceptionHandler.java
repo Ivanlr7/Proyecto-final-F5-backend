@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import dev.ivan.reviewverso_back.register.exceptions.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
    
