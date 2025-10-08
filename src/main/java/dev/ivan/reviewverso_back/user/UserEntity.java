@@ -5,6 +5,7 @@ import java.util.Set;
 import dev.ivan.reviewverso_back.role.RoleEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import dev.ivan.reviewverso_back.profile.ProfileEntity;
 
 @Entity
 @Table(name = "users")
@@ -28,5 +29,6 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private ProfileEntity profile;
 }
