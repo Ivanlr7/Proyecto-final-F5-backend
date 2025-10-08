@@ -8,4 +8,4 @@ public record RegisterResponseDTO(
     String email,
     String profileImage,
     Set<String> roles
-)
+) {}
