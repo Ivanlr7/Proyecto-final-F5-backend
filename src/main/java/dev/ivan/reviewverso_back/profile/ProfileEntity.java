@@ -15,7 +15,8 @@ import dev.ivan.reviewverso_back.user.UserEntity;
 public class ProfileEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id_profile;
+	@Column(name = "id_profile")
+	private Long idProfile;
 
 	@Column(length = 512)
 	private String profileImageUrl;

@@ -16,7 +16,8 @@ import lombok.*;
 public class RoleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_role;
+    @Column(name = "id_role")
+    private Long idRole;
 
     @Column(unique = true)
     private String name;
