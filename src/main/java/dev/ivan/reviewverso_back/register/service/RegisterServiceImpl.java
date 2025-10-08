@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
+import dev.ivan.reviewverso_back.file.FileStorageService;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,11 +24,12 @@ public class RegisterServiceImpl implements RegisterService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
+	private final FileStorageService fileStorageService;
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
 	@Transactional
-	public RegisterResponseDTO register(RegisterRequestDTO request) {
+	public RegisterResponseDTO register(RegisterRequestDTO request, MultipartFile profileImage) {
 	
 		if (userRepository.findByEmail(request.email()).isPresent()) {
 			throw new RegisterIllegalArgument("El email ya está registrado");
@@ -50,8 +53,17 @@ public class RegisterServiceImpl implements RegisterService {
 		}
 
 	
+
+		String imageFileName = null;
+		if (profileImage != null && !profileImage.isEmpty()) {
+			try {
+				imageFileName = fileStorageService.storeFile(profileImage);
+			} catch (IOException e) {
+				throw new RegisterIllegalArgument("Error al guardar la imagen de perfil", e);
+			}
+		}
 		ProfileEntity profile = ProfileEntity.builder()
-				.profileImage(request.profileImage())
+				.profileImage(imageFileName)
 				.build();
 
 		UserEntity user = UserEntity.builder()
