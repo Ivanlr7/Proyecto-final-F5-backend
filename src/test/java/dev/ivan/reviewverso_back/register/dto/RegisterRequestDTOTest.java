@@ -13,12 +13,12 @@ class RegisterRequestDTOTest {
             "test@email.com",
             "password123",
             "image.png",
-            Set.of("USER", "ADMIN")
+            Set.of("ROLE_USER", "ROLE_ADMIN")
         );
         assertThat(dto.userName(), is("testuser"));
         assertThat(dto.email(), is("test@email.com"));
         assertThat(dto.password(), is("password123"));
         assertThat(dto.profileImage(), is("image.png"));
-        assertThat(dto.roles(), containsInAnyOrder("USER", "ADMIN"));
+        assertThat(dto.roles(), containsInAnyOrder("ROLE_USER", "ROLE_ADMIN"));
     }
 }

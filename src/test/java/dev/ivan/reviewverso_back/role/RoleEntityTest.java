@@ -11,11 +11,11 @@ class RoleEntityTest {
     void testRoleEntityFields() {
         RoleEntity role = RoleEntity.builder()
             .idRole(1L)
-            .name("USER")
+            .name("ROLE_USER")
             .users(Set.of())
             .build();
         assertThat(role.getIdRole(), is(1L));
-        assertThat(role.getName(), is("USER"));
+        assertThat(role.getName(), is("ROLE_USER"));
         assertThat(role.getUsers(), is(empty()));
     }
 }
