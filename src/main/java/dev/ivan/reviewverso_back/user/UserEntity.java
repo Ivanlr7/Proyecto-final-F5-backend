@@ -25,10 +25,13 @@ public class UserEntity {
     @JoinTable(name = "roles_users", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RoleEntity> roles;
     
+    @Column(nullable = false, length = 100)
+    private String userName;
     @Column(nullable = false, unique = true, length = 100)
-    private String email; 
+    private String email;
     @Column(nullable = false)
     private String password;
+
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ProfileEntity profile;

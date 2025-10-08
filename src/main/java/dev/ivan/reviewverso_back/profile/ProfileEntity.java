@@ -19,7 +19,7 @@ public class ProfileEntity {
 	private Long idProfile;
 
 	@Column(length = 512)
-	private String profileImageUrl;
+	private String profileImage;
 
 	@OneToOne
 	@JoinColumn(name = "user_id", referencedColumnName = "id_user")
