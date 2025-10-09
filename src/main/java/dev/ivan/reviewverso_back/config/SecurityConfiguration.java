@@ -16,6 +16,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import dev.ivan.security.JpaUserDetailsService;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -24,6 +26,13 @@ public class SecurityConfiguration {
     
     @Value("${api-endpoint}")
     private String endpoint;
+
+        private JpaUserDetailsService jpaUserDetailsService;
+
+    public SecurityConfiguration(JpaUserDetailsService jpaUserDetailsService) {
+        this.jpaUserDetailsService = jpaUserDetailsService;
+    }
+
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
