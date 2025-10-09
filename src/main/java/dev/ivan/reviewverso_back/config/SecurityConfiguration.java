@@ -46,7 +46,8 @@ public class SecurityConfiguration {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                                  .requestMatchers(endpoint + "/register").permitAll()
+                        .requestMatchers(endpoint + "/register").permitAll()
+                        .requestMatchers(endpoint + "/auth").permitAll()
                     )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
                 
