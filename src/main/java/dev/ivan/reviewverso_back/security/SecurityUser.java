@@ -1,4 +1,4 @@
-package dev.ivan.security;
+package dev.ivan.reviewverso_back.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getUserName();
     }
 
     @Override

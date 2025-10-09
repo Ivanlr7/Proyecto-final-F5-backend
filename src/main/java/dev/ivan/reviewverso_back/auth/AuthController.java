@@ -1,6 +1,5 @@
 package dev.ivan.reviewverso_back.auth;
 
-import dev.ivan.reviewverso_back.auth.dto.AuthResponseDTO;
 import dev.ivan.reviewverso_back.register.dto.RegisterRequestDTO;
 
 import org.springframework.security.core.Authentication;
@@ -21,9 +20,13 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public AuthResponseDTO token(Authentication authentication) {
-        String jwt = tokenService.generateToken(authentication);
-        return new AuthResponseDTO(jwt);
+    public ResponseEntity<?> token(Authentication authentication) {
+        try {
+            String token = tokenService.generateToken(authentication);
+            return ResponseEntity.ok(token);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body("No autenticado: credenciales inválidas o faltantes");
+        }
     }
 
 }

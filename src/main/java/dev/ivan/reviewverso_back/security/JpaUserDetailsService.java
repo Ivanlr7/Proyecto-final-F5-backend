@@ -1,4 +1,4 @@
-package dev.ivan.security;
+package dev.ivan.reviewverso_back.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import dev.ivan.reviewverso_back.user.UserRepository;
+import dev.ivan.reviewverso_back.user.exceptions.UserNotFoundException;
 
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
@@ -17,12 +18,11 @@ public class JpaUserDetailsService implements UserDetailsService {
     }
 
         @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-
-        return userRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+  
+        return userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUserName(identifier))
                 .map(SecurityUser::new)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con este email"));
-
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con este email o userName"));
     }
 }
