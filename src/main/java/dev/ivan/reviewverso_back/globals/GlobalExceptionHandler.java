@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import dev.ivan.reviewverso_back.register.exceptions.*;
+import dev.ivan.reviewverso_back.user.exceptions.*;
 
 
 @RestControllerAdvice
@@ -16,6 +17,16 @@ public class GlobalExceptionHandler {
    
   @ExceptionHandler(RegisterIllegalArgumentException.class)
   public ResponseEntity<GlobalExceptionResponseDTO> handleRegisResponseEntity(RegisterIllegalArgumentException ex) {
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleUserNotFound(UserNotFoundException ex) {
+    return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(UserIllegalArgumentException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleUserIllegalArgument(UserIllegalArgumentException ex) {
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
   }
 
