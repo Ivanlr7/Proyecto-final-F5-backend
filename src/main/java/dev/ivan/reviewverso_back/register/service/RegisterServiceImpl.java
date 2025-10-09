@@ -2,7 +2,7 @@
 package dev.ivan.reviewverso_back.register.service;
 
 import dev.ivan.reviewverso_back.register.dto.*;
-import dev.ivan.reviewverso_back.register.exceptions.RegisterIllegalArgument;
+import dev.ivan.reviewverso_back.register.exceptions.RegisterIllegalArgumentException;
 import dev.ivan.reviewverso_back.user.UserEntity;
 import dev.ivan.reviewverso_back.user.UserRepository;
 import dev.ivan.reviewverso_back.profile.ProfileEntity;
@@ -32,11 +32,11 @@ public class RegisterServiceImpl implements RegisterService {
 	public RegisterResponseDTO register(RegisterRequestDTO request, MultipartFile profileImage) {
 	
 		if (userRepository.findByEmail(request.email()).isPresent()) {
-			throw new RegisterIllegalArgument("El email ya está registrado");
+			throw new RegisterIllegalArgumentException("El email ya está registrado");
 		}
 
 		if (userRepository.findByUserName(request.userName()).isPresent()) {
-			throw new RegisterIllegalArgument("El nombre de usuario ya está registrado");
+			throw new RegisterIllegalArgumentException("El nombre de usuario ya está registrado");
 		}
 
 		// Hasheo de roles
@@ -47,7 +47,7 @@ public class RegisterServiceImpl implements RegisterService {
 		if (request.roles() != null) {
 			for (String roleName : request.roles()) {
 				RoleEntity role = roleRepository.findByName(roleName)
-						.orElseThrow(() -> new RegisterIllegalArgument("Rol no encontrado: " + roleName));
+						.orElseThrow(() -> new RegisterIllegalArgumentException("Rol no encontrado: " + roleName));
 				roles.add(role);
 			}
 		}
@@ -59,7 +59,7 @@ public class RegisterServiceImpl implements RegisterService {
 			try {
 				imageFileName = fileStorageService.storeFile(profileImage);
 			} catch (IOException e) {
-				throw new RegisterIllegalArgument("Error al guardar la imagen de perfil", e);
+				throw new RegisterIllegalArgumentException("Error al guardar la imagen de perfil", e);
 			}
 		}
 		ProfileEntity profile = ProfileEntity.builder()

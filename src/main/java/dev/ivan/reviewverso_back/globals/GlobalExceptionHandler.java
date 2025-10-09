@@ -1,0 +1,32 @@
+package dev.ivan.reviewverso_back.globals;
+
+import java.time.LocalDateTime;
+
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties.Http;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import dev.ivan.reviewverso_back.register.exceptions.*;
+
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+   
+  @ExceptionHandler(RegisterIllegalArgumentException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleRegisResponseEntity(RegisterIllegalArgumentException ex) {
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+      private ResponseEntity<GlobalExceptionResponseDTO> buildResponse(HttpStatus status, String message) {
+        GlobalExceptionResponseDTO error = new GlobalExceptionResponseDTO(
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
+}

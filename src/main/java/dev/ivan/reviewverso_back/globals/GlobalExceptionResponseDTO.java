@@ -1,4 +1,4 @@
-package dev.ivan.reviewverso_back.register.globals;
+package dev.ivan.reviewverso_back.globals;
 
 import java.time.LocalDateTime;
 
