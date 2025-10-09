@@ -44,12 +44,16 @@ public class RegisterServiceImpl implements RegisterService {
 
 		// Asignación de roles
 		Set<RoleEntity> roles = new HashSet<>();
-		if (request.roles() != null) {
+		if (request.roles() != null && !request.roles().isEmpty()) {
 			for (String roleName : request.roles()) {
 				RoleEntity role = roleRepository.findByName(roleName)
 						.orElseThrow(() -> new RegisterIllegalArgumentException("Rol no encontrado: " + roleName));
 				roles.add(role);
 			}
+		} else {
+			RoleEntity defaultRole = roleRepository.findByName("ROLE_USER")
+				.orElseThrow(() -> new RegisterIllegalArgumentException("Rol por defecto no encontrado: ROLE_USER"));
+			roles.add(defaultRole);
 		}
 
 	
