@@ -59,10 +59,10 @@ class RegisterServiceImplTest {
 
     @Test
     void register_throwsException_whenRoleNotFound() {
-        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, Set.of("ROLE_USER"));
+        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, null);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
-        when(roleRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.empty());
         assertThrows(RegisterIllegalArgumentException.class, () -> registerService.register(dto, null));
     }
 
@@ -80,11 +80,11 @@ class RegisterServiceImplTest {
 
     @Test
     void register_success_withImage() throws Exception {
-        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, Set.of("ROLE_USER"));
+        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, null);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
         RoleEntity role = new RoleEntity();
-        when(roleRepository.findByName(anyString())).thenReturn(Optional.of(role));
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         MultipartFile file = mock(MultipartFile.class);
         when(file.isEmpty()).thenReturn(false);
@@ -97,11 +97,11 @@ class RegisterServiceImplTest {
 
     @Test
     void register_success_withoutImage() {
-        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, Set.of("ROLE_USER"));
+        RegisterRequestDTO dto = new RegisterRequestDTO("usuario", "correo@ejemplo.com", "1234", null, null);
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
         RoleEntity role = new RoleEntity();
-        when(roleRepository.findByName(anyString())).thenReturn(Optional.of(role));
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
         when(userRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         RegisterResponseDTO response = registerService.register(dto, null);
