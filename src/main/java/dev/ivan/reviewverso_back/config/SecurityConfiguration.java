@@ -2,6 +2,7 @@ package dev.ivan.reviewverso_back.config;
 
 import java.util.Arrays;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import dev.ivan.reviewverso_back.auth.JwtBlacklistFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,7 +35,7 @@ public class SecurityConfiguration {
     private String endpoint;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtBlacklistFilter jwtBlacklistFilter) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfiguration()))
                 .csrf(csfr -> csfr
@@ -46,10 +48,12 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, endpoint + "/register").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/token").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, endpoint + "/auth/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(jwtDecoder())))
+                .addFilterBefore(jwtBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());
 
         http.headers(header -> header.frameOptions(frame -> frame.sameOrigin()));
