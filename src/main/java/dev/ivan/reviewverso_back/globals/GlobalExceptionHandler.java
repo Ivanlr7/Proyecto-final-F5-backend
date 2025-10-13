@@ -25,6 +25,11 @@ public class GlobalExceptionHandler {
     return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
+      @ExceptionHandler(UserAccessDeniedException.class)
+public ResponseEntity<GlobalExceptionResponseDTO> handleUserAccessDenied(UserAccessDeniedException ex) {
+    return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+}
+
   @ExceptionHandler(UserIllegalArgumentException.class)
   public ResponseEntity<GlobalExceptionResponseDTO> handleUserIllegalArgument(UserIllegalArgumentException ex) {
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -40,4 +45,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    
 }

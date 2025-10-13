@@ -49,6 +49,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/token").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/logout").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, endpoint + "/users/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE + "/users/**").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.PUT + "/users").hasAnyRole("USER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, endpoint + "/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
