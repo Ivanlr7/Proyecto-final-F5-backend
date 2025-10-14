@@ -50,6 +50,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/logout").permitAll()
 
+                
+                        .requestMatchers(HttpMethod.GET, endpoint + "/files/**").permitAll()
                     
                         .requestMatchers(HttpMethod.GET, endpoint + "/users/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, endpoint + "/users/**").permitAll()

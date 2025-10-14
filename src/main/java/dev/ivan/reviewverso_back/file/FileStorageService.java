@@ -1,9 +1,12 @@
 package dev.ivan.reviewverso_back.file;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,5 +27,38 @@ public class FileStorageService {
         Path filePath = Paths.get(uploadDir, fileName);
         file.transferTo(filePath);
         return fileName;
+    }
+
+
+     //Recupera un archivo almacenado por su nombre
+   
+    public Resource loadFileAsResource(String fileName) throws MalformedURLException {
+        Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+        Resource resource = new UrlResource(filePath.toUri());
+        
+        if (resource.exists() && resource.isReadable()) {
+            return resource;
+        } else {
+            throw new RuntimeException("Archivo no encontrado: " + fileName);
+        }
+    }
+
+    //Verifica si un archivo existe
+     
+    public boolean fileExists(String fileName) {
+        Path filePath = Paths.get(uploadDir, fileName);
+        return Files.exists(filePath);
+    }
+
+   
+    //Elimina un archivo
+ 
+    public boolean deleteFile(String fileName) {
+        try {
+            Path filePath = Paths.get(uploadDir, fileName);
+            return Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
