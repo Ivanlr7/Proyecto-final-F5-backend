@@ -62,4 +62,17 @@ public class SecurityUser implements UserDetails {
         return true;
     }
 
+    // Métodos adicionales para extraer información del usuario
+    public Long getUserId() {
+        return user.getIdUser();
+    }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
 }

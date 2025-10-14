@@ -30,23 +30,66 @@ public class TokenService {
 
         Instant now = Instant.now();
 
-        String scope = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .filter(authority -> !authority.startsWith("ROLE"))
-                .collect(Collectors.joining(" "));
+        // Recopilar roles del usuario autenticado
+        String roles = collectRoles(authentication);
+        
+        // Obtener información adicional del usuario si es SecurityUser
+        Long userId = extractUserId(authentication);
+        String email = extractEmail(authentication);
 
-        System.out.println("<--------------" + scope.toString());
+        System.out.println("<-------------- roles: " + roles);
+        System.out.println("<-------------- userId: " + userId);
+        System.out.println("<-------------- email: " + email);
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .subject(authentication.getName())
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
-                .claim("scope", scope)
-                .build();
+                .claim("scope", roles);
+        
+        // Agregar claims adicionales si están disponibles
+        if (userId != null) {
+            claimsBuilder.claim("userId", userId);
+        }
+        if (email != null && !email.isEmpty()) {
+            claimsBuilder.claim("email", email);
+        }
+
+        JwtClaimsSet claims = claimsBuilder.build();
 
         var encoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS512).build(), claims);
         return this.jwtEncoder.encode(encoderParameters).getTokenValue();
+    }
+
+    /**
+     * Recopila los roles del usuario autenticado
+     */
+    private String collectRoles(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(authority -> authority.startsWith("ROLE_"))
+                .collect(Collectors.joining(" "));
+    }
+
+    /**
+     * Extrae el ID del usuario si el principal es SecurityUser
+     */
+    private Long extractUserId(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof dev.ivan.reviewverso_back.security.SecurityUser securityUser) {
+            return securityUser.getUserId();
+        }
+        return null;
+    }
+
+    /**
+     * Extrae el email del usuario si el principal es SecurityUser
+     */
+    private String extractEmail(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof dev.ivan.reviewverso_back.security.SecurityUser securityUser) {
+            return securityUser.getEmail();
+        }
+        return null;
     }
 
     /**

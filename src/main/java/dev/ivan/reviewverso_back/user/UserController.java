@@ -31,6 +31,46 @@ public class UserController {
     private final IUserService<UserResponseDTO, UserRequestDTO> userService;
     private final UserRepository userRepository;
 
+    /**
+     * Obtiene el ID del usuario desde el JWT
+     */
+    private Long getUserIdFromJwt(Principal principal) {
+        if (principal instanceof Authentication authentication) {
+            if (authentication.getPrincipal() instanceof Jwt jwt) {
+                return jwt.getClaim("userId");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Verifica si el usuario tiene un rol específico
+     */
+    private boolean hasRole(Principal principal, String roleName) {
+        if (principal instanceof Authentication authentication) {
+            return authentication.getAuthorities().stream()
+                    .anyMatch(authority -> 
+                        authority.getAuthority().equals("ROLE_" + roleName) || 
+                        authority.getAuthority().equals("SCOPE_ROLE_" + roleName)
+                    );
+        }
+        return false;
+    }
+
+    /**
+     * Obtiene el usuario actual desde el JWT o por userName como fallback
+     */
+    private UserEntity getCurrentUserEntity(Principal principal) {
+        Long userId = getUserIdFromJwt(principal);
+        if (userId != null) {
+            return userRepository.findById(userId)
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        }
+        // Fallback: buscar por userName
+        return userRepository.findByUserName(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    }
+
 
     @GetMapping("")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
@@ -40,11 +80,8 @@ public class UserController {
 
    @GetMapping("/{id}")
 public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id, Principal principal) {
-    UserEntity currentUser = userRepository.findByEmail(principal.getName())
-            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-    boolean isAdmin = currentUser.getRoles().stream()
-            .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+    UserEntity currentUser = getCurrentUserEntity(principal);
+    boolean isAdmin = hasRole(principal, "ADMIN");
 
     if (!isAdmin && !currentUser.getIdUser().equals(id)) {
         throw new UserAccessDeniedException("No puedes acceder a otro usuario");
@@ -59,11 +96,8 @@ public ResponseEntity<UserResponseDTO> updateUser(
         @RequestBody UserRequestDTO dto,
         Principal principal) {
 
-    UserEntity currentUser = userRepository.findByEmail(principal.getName())
-            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-    boolean isAdmin = currentUser.getRoles().stream()
-            .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+    UserEntity currentUser = getCurrentUserEntity(principal);
+    boolean isAdmin = hasRole(principal, "ADMIN");
 
     if (!isAdmin && !currentUser.getIdUser().equals(id)) {
         throw new UserAccessDeniedException("No puedes editar otro usuario");
@@ -74,11 +108,8 @@ public ResponseEntity<UserResponseDTO> updateUser(
 
 @DeleteMapping("/{id}")
 public ResponseEntity<Void> deleteUser(@PathVariable Long id, Principal principal) {
-    UserEntity currentUser = userRepository.findByEmail(principal.getName())
-            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-    boolean isAdmin = currentUser.getRoles().stream()
-            .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+    UserEntity currentUser = getCurrentUserEntity(principal);
+    boolean isAdmin = hasRole(principal, "ADMIN");
 
     if (!isAdmin && !currentUser.getIdUser().equals(id)) {
         throw new UserAccessDeniedException("No puedes borrar otro usuario");
@@ -90,8 +121,7 @@ public ResponseEntity<Void> deleteUser(@PathVariable Long id, Principal principa
       
     @GetMapping("/me")
 public ResponseEntity<UserResponseDTO> getCurrentUser(Principal principal) {
-    UserEntity user = userRepository.findByEmail(principal.getName())
-        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+    UserEntity user = getCurrentUserEntity(principal);
     return ResponseEntity.ok(userService.getByID(user.getIdUser()));
 }
 }
