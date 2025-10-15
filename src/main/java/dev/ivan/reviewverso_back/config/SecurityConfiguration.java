@@ -49,19 +49,22 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/token").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/logout").permitAll()
-
+                        
+                        .requestMatchers(HttpMethod.GET, endpoint + "/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
                 
                         .requestMatchers(HttpMethod.GET, endpoint + "/files/**").permitAll()
-                    
-                        .requestMatchers(HttpMethod.GET, endpoint + "/users/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, endpoint + "/users/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, endpoint + "/users").hasRole("ADMIN")
+                     
                         
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.decoder(jwtDecoder())))
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt
+                    .decoder(jwtDecoder())
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                ))
                 .addFilterBefore(jwtBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());
 
@@ -91,6 +94,34 @@ public class SecurityConfiguration {
     @Bean
     public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
         return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
+
+    /**
+     * Convierte los claims del JWT en authorities de Spring Security
+     */
+    @Bean
+    public org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter jwtAuthenticationConverter() {
+        org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter = 
+            new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter();
+        
+        // Converter personalizado para authorities
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            String scope = jwt.getClaimAsString("scope");
+            if (scope != null && !scope.isEmpty()) {
+                return java.util.Arrays.stream(scope.split(" "))
+                    .map(role -> {
+                        // Convertir SCOPE_ROLE_USER a ROLE_USER para compatibilidad con hasRole()
+                        if (role.startsWith("ROLE_")) {
+                            return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
+                        }
+                        return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+            }
+            return java.util.List.of();
+        });
+        
+        return converter;
     }
 
     @Bean
