@@ -50,8 +50,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        // El cliente es responsable de eliminar el token del localStorage/sessionStorage
-        // El token expirará naturalmente según su tiempo de vida configurado
+  
         return ResponseEntity.ok().body("Sesión cerrada con éxito");
     }
 
