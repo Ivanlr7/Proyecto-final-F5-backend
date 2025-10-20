@@ -46,6 +46,11 @@ public ResponseEntity<GlobalExceptionResponseDTO> handleUserAccessDenied(UserAcc
     return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
   }
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
       private ResponseEntity<GlobalExceptionResponseDTO> buildResponse(HttpStatus status, String message) {
         GlobalExceptionResponseDTO error = new GlobalExceptionResponseDTO(
                 status.value(),

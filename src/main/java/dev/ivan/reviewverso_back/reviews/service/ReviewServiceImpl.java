@@ -105,7 +105,7 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewEntity review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Reseña no encontrada con id: " + id));
 
-        // Actualizar campos con validaciones
+       
         if (dto.reviewTitle() != null) {
             if (dto.reviewTitle().length() > 200) {
                 throw new IllegalArgumentException("El título no puede superar los 200 caracteres");
