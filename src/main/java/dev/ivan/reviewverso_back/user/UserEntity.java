@@ -1,8 +1,10 @@
 package dev.ivan.reviewverso_back.user;
 
+import java.util.List;
 import java.util.Set;
 
 import dev.ivan.reviewverso_back.role.RoleEntity;
+import dev.ivan.reviewverso_back.reviews.ReviewEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import dev.ivan.reviewverso_back.profile.ProfileEntity;
@@ -35,4 +37,7 @@ public class UserEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ProfileEntity profile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewEntity> reviews;
 }

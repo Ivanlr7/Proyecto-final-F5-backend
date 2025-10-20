@@ -54,6 +54,12 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
                 
                         .requestMatchers(HttpMethod.GET, endpoint + "/files/**").permitAll()
+                        
+                        .requestMatchers(HttpMethod.GET, endpoint + "/reviews").permitAll()
+                        .requestMatchers(HttpMethod.GET, endpoint + "/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
                      
                         
                         .anyRequest().authenticated()

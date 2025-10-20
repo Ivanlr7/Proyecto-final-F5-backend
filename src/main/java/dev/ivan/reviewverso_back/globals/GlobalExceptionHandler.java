@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import dev.ivan.reviewverso_back.register.exceptions.*;
 import dev.ivan.reviewverso_back.user.exceptions.*;
+import dev.ivan.reviewverso_back.reviews.exceptions.*;
 
 
 @RestControllerAdvice
@@ -33,6 +34,16 @@ public ResponseEntity<GlobalExceptionResponseDTO> handleUserAccessDenied(UserAcc
   @ExceptionHandler(UserIllegalArgumentException.class)
   public ResponseEntity<GlobalExceptionResponseDTO> handleUserIllegalArgument(UserIllegalArgumentException ex) {
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  @ExceptionHandler(ReviewNotFoundException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleReviewNotFound(ReviewNotFoundException ex) {
+    return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(DuplicateReviewException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleDuplicateReview(DuplicateReviewException ex) {
+    return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
   }
 
       private ResponseEntity<GlobalExceptionResponseDTO> buildResponse(HttpStatus status, String message) {

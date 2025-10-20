@@ -130,6 +130,126 @@
           }
         }
       ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Crear reseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contentType\": \"MOVIE\",\n  \"contentId\": \"550\",\n  \"apiSource\": \"TMDB\",\n  \"reviewTitle\": \"Una obra maestra\",\n  \"reviewText\": \"Fight Club es increíble...\",\n  \"rating\": 5.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Obtener todas las reseñas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Obtener reseña por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews",":id"]
+            }
+          }
+        },
+        {
+          "name": "Obtener reseñas por usuario",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews","user",":userId"]
+            }
+          }
+        },
+        {
+          "name": "Obtener reseñas por contenido",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews/content?contentType=MOVIE&contentId=550",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews","content"],
+              "query": [
+                { "key": "contentType", "value": "MOVIE" },
+                { "key": "contentId", "value": "550" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener estadísticas de contenido",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/reviews/content/stats?contentType=MOVIE&contentId=550",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews","content","stats"],
+              "query": [
+                { "key": "contentType", "value": "MOVIE" },
+                { "key": "contentId", "value": "550" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar reseña",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewTitle\": \"Una obra maestra actualizada\",\n  \"reviewText\": \"Fight Club es una película brillante...\",\n  \"rating\": 4.8\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews",":id"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar reseña",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews",":id"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
