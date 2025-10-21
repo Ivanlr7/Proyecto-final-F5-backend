@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,6 +30,72 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 @WebMvcTest(ReviewController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class ReviewControllerTest {
+    @Test
+    @DisplayName("GET /reviews/user/{userId} responde con las reseñas del usuario")
+    void getReviewsByUser_returnsList() throws Exception {
+        ReviewResponseDTO r1 = new ReviewResponseDTO(1L, 2L, "usuario1", null, ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Titulo", "Texto", 4.0, LocalDateTime.now(), LocalDateTime.now());
+        Mockito.when(reviewService.getReviewsByUserId(2L)).thenReturn(List.of(r1));
+
+        mockMvc.perform(get("/api/v1/reviews/user/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].userName", is("usuario1")));
+    }
+
+    @Test
+    @DisplayName("GET /reviews/content responde con las reseñas del contenido")
+    void getReviewsByContent_returnsList() throws Exception {
+        ReviewResponseDTO r1 = new ReviewResponseDTO(1L, 2L, "usuario1", null, ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Titulo", "Texto", 4.0, LocalDateTime.now(), LocalDateTime.now());
+        Mockito.when(reviewService.getReviewsByContent(ContentType.MOVIE, "MOV123")).thenReturn(List.of(r1));
+
+        mockMvc.perform(get("/api/v1/reviews/content")
+                .param("contentType", "MOVIE")
+                .param("contentId", "MOV123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].contentId", is("MOV123")));
+    }
+
+    @Test
+    @DisplayName("GET /reviews/content/stats responde con stats del contenido")
+    void getContentStats_returnsStats() throws Exception {
+        Mockito.when(reviewService.getAverageRatingByContent(ContentType.MOVIE, "MOV123")).thenReturn(4.5);
+        Mockito.when(reviewService.getTotalReviewsByContent(ContentType.MOVIE, "MOV123")).thenReturn(3L);
+
+        mockMvc.perform(get("/api/v1/reviews/content/stats")
+                .param("contentType", "MOVIE")
+                .param("contentId", "MOV123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.contentType", is("MOVIE")))
+                .andExpect(jsonPath("$.contentId", is("MOV123")))
+                .andExpect(jsonPath("$.averageRating", is(4.5)))
+                .andExpect(jsonPath("$.totalReviews", is(3)));
+    }
+
+    @Test
+    @DisplayName("PUT /reviews/{id} actualiza y responde con la reseña actualizada")
+    void updateReview_returnsUpdated() throws Exception {
+        ReviewRequestDTO request = new ReviewRequestDTO(ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Nuevo título", "Texto actualizado", 4.5);
+        ReviewResponseDTO response = new ReviewResponseDTO(1L, 2L, "usuario1", null, ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Nuevo título", "Texto actualizado", 4.5, LocalDateTime.now(), LocalDateTime.now());
+        Mockito.when(reviewService.updateEntity(eq(1L), any())).thenReturn(response);
+
+        mockMvc.perform(put("/api/v1/reviews/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idReview", is(1)))
+                .andExpect(jsonPath("$.reviewTitle", is("Nuevo título")))
+                .andExpect(jsonPath("$.rating", is(4.5)));
+    }
+
+    @Test
+    @DisplayName("DELETE /reviews/{id} elimina la reseña y responde 204")
+    void deleteReview_returnsNoContent() throws Exception {
+        Mockito.doNothing().when(reviewService).deleteEntity(1L);
+
+        mockMvc.perform(delete("/api/v1/reviews/1"))
+                .andExpect(status().isNoContent());
+    }
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
