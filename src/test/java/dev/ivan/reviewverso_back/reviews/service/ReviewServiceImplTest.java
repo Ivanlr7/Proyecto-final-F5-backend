@@ -27,8 +27,90 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ReviewServiceImplTest {
+
+    @Test
+    @DisplayName("getReviewsByUserId retorna lista de reseñas del usuario")
+    void getReviewsByUserId_returnsList() {
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+        when(reviewRepository.findByUser_IdUser(2L)).thenReturn(List.of(r));
+        when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
+        List<ReviewResponseDTO> result = reviewService.getReviewsByUserId(2L);
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0), is(dto));
+    }
+
+    @Test
+    @DisplayName("getReviewsByContent retorna lista de reseñas del contenido")
+    void getReviewsByContent_returnsList() {
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+        when(reviewRepository.findByContentTypeAndContentId(ContentType.MOVIE, "MOV123")).thenReturn(List.of(r));
+        when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
+        List<ReviewResponseDTO> result = reviewService.getReviewsByContent(ContentType.MOVIE, "MOV123");
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0), is(dto));
+    }
+
+    @Test
+    @DisplayName("getAverageRatingByContent retorna el promedio correcto")
+    void getAverageRatingByContent_returnsAverage() {
+        when(reviewRepository.calculateAverageRating(ContentType.MOVIE, "MOV123")).thenReturn(4.5);
+        Double avg = reviewService.getAverageRatingByContent(ContentType.MOVIE, "MOV123");
+        assertThat(avg, is(4.5));
+    }
+
+    @Test
+    @DisplayName("getTotalReviewsByContent retorna el total correcto")
+    void getTotalReviewsByContent_returnsTotal() {
+        when(reviewRepository.countByContentTypeAndContentId(ContentType.MOVIE, "MOV123")).thenReturn(3L);
+        Long total = reviewService.getTotalReviewsByContent(ContentType.MOVIE, "MOV123");
+        assertThat(total, is(3L));
+    }
+
+    @Test
+    @DisplayName("createEntity lanza DuplicateReviewException si ya existe reseña")
+    void createEntity_throwsDuplicateReviewException() {
+        ReviewRequestDTO dto = new ReviewRequestDTO(ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Titulo", "Texto suficiente", 4.0);
+        UserEntity user = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        when(userRepository.findByUserName("usuario1")).thenReturn(Optional.of(user));
+        when(reviewRepository.existsByUser_IdUserAndContentTypeAndContentId(1L, ContentType.MOVIE, "MOV123")).thenReturn(true);
+
+        Exception ex = assertThrows(dev.ivan.reviewverso_back.reviews.exceptions.DuplicateReviewException.class,
+            () -> reviewService.createEntity(dto));
+        assertThat(ex.getMessage(), containsString("Ya has escrito una reseña"));
+    }
+
+    @Test
+    @DisplayName("getByID lanza ReviewNotFoundException si no existe la reseña")
+    void getByID_throwsReviewNotFoundException() {
+        when(reviewRepository.findById(99L)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(dev.ivan.reviewverso_back.reviews.exceptions.ReviewNotFoundException.class,
+            () -> reviewService.getByID(99L));
+        assertThat(ex.getMessage(), containsString("Reseña no encontrada"));
+    }
+
+    @Test
+    @DisplayName("updateEntity lanza ReviewNotFoundException si no existe la reseña")
+    void updateEntity_throwsReviewNotFoundException() {
+        ReviewRequestDTO dto = new ReviewRequestDTO(ContentType.MOVIE, "MOV123", ApiSource.TMDB, "Titulo", "Texto suficiente", 4.0);
+        when(reviewRepository.findById(99L)).thenReturn(Optional.empty());
+        Exception ex = assertThrows(dev.ivan.reviewverso_back.reviews.exceptions.ReviewNotFoundException.class,
+            () -> reviewService.updateEntity(99L, dto));
+        assertThat(ex.getMessage(), containsString("Reseña no encontrada"));
+    }
+
+    @Test
+    @DisplayName("deleteEntity lanza ReviewNotFoundException si no existe la reseña")
+    void deleteEntity_throwsReviewNotFoundException() {
+        when(reviewRepository.existsById(99L)).thenReturn(false);
+        Exception ex = assertThrows(dev.ivan.reviewverso_back.reviews.exceptions.ReviewNotFoundException.class,
+            () -> reviewService.deleteEntity(99L));
+        assertThat(ex.getMessage(), containsString("Reseña no encontrada"));
+    }
     @Mock
     private ReviewRepository reviewRepository;
     @Mock
