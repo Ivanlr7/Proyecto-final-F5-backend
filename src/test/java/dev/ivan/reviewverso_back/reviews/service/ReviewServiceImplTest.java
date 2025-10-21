@@ -28,8 +28,99 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class ReviewServiceImplTest {
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si contentType es null")
+    void validateReviewRequest_contentTypeNull() throws Exception {
+        ReviewRequestDTO dto = new ReviewRequestDTO(null, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", 4.0);
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        Exception ex = assertThrows(Exception.class, () -> method.invoke(reviewService, dto));
+        assertThat(ex.getCause().getMessage(), containsString("tipo de contenido"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si contentId es null o blank")
+    void validateReviewRequest_contentIdNullOrBlank() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dtoNull = new ReviewRequestDTO(ContentType.MOVIE, null, dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", 4.0);
+        ReviewRequestDTO dtoBlank = new ReviewRequestDTO(ContentType.MOVIE, "", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", 4.0);
+        Exception ex1 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoNull));
+        Exception ex2 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoBlank));
+        assertThat(ex1.getCause().getMessage(), containsString("ID del contenido"));
+        assertThat(ex2.getCause().getMessage(), containsString("ID del contenido"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si apiSource es null")
+    void validateReviewRequest_apiSourceNull() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dto = new ReviewRequestDTO(ContentType.MOVIE, "id", null, "Titulo", "Texto suficiente", 4.0);
+        Exception ex = assertThrows(Exception.class, () -> method.invoke(reviewService, dto));
+        assertThat(ex.getCause().getMessage(), containsString("fuente de la API"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si reviewTitle es null, blank o demasiado largo")
+    void validateReviewRequest_reviewTitleNullBlankOrTooLong() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dtoNull = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, null, "Texto suficiente", 4.0);
+        ReviewRequestDTO dtoBlank = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "", "Texto suficiente", 4.0);
+        ReviewRequestDTO dtoLong = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "a".repeat(201), "Texto suficiente", 4.0);
+        Exception ex1 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoNull));
+        Exception ex2 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoBlank));
+        Exception ex3 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoLong));
+        assertThat(ex1.getCause().getMessage(), containsString("título de la reseña"));
+        assertThat(ex2.getCause().getMessage(), containsString("título de la reseña"));
+        assertThat(ex3.getCause().getMessage(), containsString("superar los 200 caracteres"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si reviewText es null, blank o demasiado corto")
+    void validateReviewRequest_reviewTextNullBlankOrTooShort() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dtoNull = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", null, 4.0);
+        ReviewRequestDTO dtoBlank = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "", 4.0);
+        ReviewRequestDTO dtoShort = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "corto", 4.0);
+        Exception ex1 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoNull));
+        Exception ex2 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoBlank));
+        Exception ex3 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoShort));
+        assertThat(ex1.getCause().getMessage(), containsString("texto de la reseña"));
+        assertThat(ex2.getCause().getMessage(), containsString("texto de la reseña"));
+        assertThat(ex3.getCause().getMessage(), containsString("al menos 10 caracteres"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest lanza excepción si rating es null o fuera de rango")
+    void validateReviewRequest_ratingNullOrOutOfBounds() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dtoNull = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", null);
+        ReviewRequestDTO dtoLow = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", -1.0);
+        ReviewRequestDTO dtoHigh = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente", 5.1);
+        Exception ex1 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoNull));
+        Exception ex2 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoLow));
+        Exception ex3 = assertThrows(Exception.class, () -> method.invoke(reviewService, dtoHigh));
+        assertThat(ex1.getCause().getMessage(), containsString("valoración es obligatoria"));
+        assertThat(ex2.getCause().getMessage(), containsString("debe estar entre 0.0 y 5.0"));
+        assertThat(ex3.getCause().getMessage(), containsString("debe estar entre 0.0 y 5.0"));
+    }
+
+    @Test
+    @DisplayName("validateReviewRequest no lanza excepción si el DTO es válido")
+    void validateReviewRequest_validDtoDoesNotThrow() throws Exception {
+        var method = reviewService.getClass().getDeclaredMethod("validateReviewRequest", ReviewRequestDTO.class);
+        method.setAccessible(true);
+        ReviewRequestDTO dto = new ReviewRequestDTO(ContentType.MOVIE, "id", dev.ivan.reviewverso_back.reviews.enums.ApiSource.TMDB, "Titulo", "Texto suficiente para la reseña", 4.0);
+        assertDoesNotThrow(() -> method.invoke(reviewService, dto));
+    }
 
     @Test
     @DisplayName("getReviewsByUserId retorna lista de reseñas del usuario")
