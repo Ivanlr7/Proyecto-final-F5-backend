@@ -54,7 +54,6 @@ class ReviewServiceImplTest {
         when(reviewRepository.findById(101L)).thenReturn(Optional.of(review));
 
         reviewService.likeReview(101L, user);
-        // Should not add again
         assertThat(review.getLikedByUsers().size(), is(1));
         verify(reviewRepository, never()).save(any());
     }
@@ -86,31 +85,26 @@ class ReviewServiceImplTest {
         verify(reviewRepository, never()).save(any());
     }
 
-    // @Test
-    // @DisplayName("getEntities returns likeCount and likedByCurrentUser correctly")
-    // void getEntities_likeInfo() {
-    //     UserEntity currentUser = UserEntity.builder().idUser(1L).userName("user1").build();
-    //     UserEntity otherUser = UserEntity.builder().idUser(2L).userName("user2").build();
-    //     ReviewEntity review = ReviewEntity.builder().idReview(200L).likedByUsers(new java.util.HashSet<>()).build();
-    //     review.getLikedByUsers().add(currentUser);
-    //     review.getLikedByUsers().add(otherUser);
-    //     when(reviewRepository.findAll()).thenReturn(List.of(review));
-    //     ReviewResponseDTO dto = new ReviewResponseDTO(200L, 1L, "user1", null, ContentType.MOVIE, "MOV1", ApiSource.TMDB, "Title", "Text", 4.0, java.time.LocalDateTime.now(), java.time.LocalDateTime.now(), 2, true);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class),
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.user.UserEntity.class)
-    //     )).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class)
-    //     )).thenReturn(dto);
-    //     // Mock getCurrentUserOrNull
-    //     when(userRepository.findByUserName("usuario1")).thenReturn(Optional.of(currentUser));
+    @Test
+    @DisplayName("getEntities returns likeCount and likedByCurrentUser correctly")
+    void getEntities_likeInfo() {
+        UserEntity currentUser = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        UserEntity otherUser = UserEntity.builder().idUser(2L).userName("user2").build();
+        ReviewEntity review = ReviewEntity.builder().idReview(200L).likedByUsers(new java.util.HashSet<>()).build();
+        review.getLikedByUsers().add(currentUser);
+        review.getLikedByUsers().add(otherUser);
+        
+        when(reviewRepository.findAll()).thenReturn(List.of(review));
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(currentUser));
+        
+        ReviewResponseDTO dto = new ReviewResponseDTO(200L, 1L, "usuario1", null, ContentType.MOVIE, "MOV1", ApiSource.TMDB, "Title", "Text", 4.0, java.time.LocalDateTime.now(), java.time.LocalDateTime.now(), 2, true);
+        lenient().when(reviewMapper.reviewEntityToReviewResponseDTO(any(), any())).thenReturn(dto);
 
-    //     List<ReviewResponseDTO> result = reviewService.getEntities();
-    //     assertThat(result, hasSize(1));
-    //     assertThat(result.get(0).likeCount(), is(2));
-    //     assertThat(result.get(0).likedByCurrentUser(), is(true));
-    // }
+        List<ReviewResponseDTO> result = reviewService.getEntities();
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0).likeCount(), is(2));
+        assertThat(result.get(0).likedByCurrentUser(), is(true));
+    }
 
     @Test
     @DisplayName("validateReviewRequest lanza excepción si contentType es null")
@@ -202,36 +196,37 @@ class ReviewServiceImplTest {
         assertDoesNotThrow(() -> method.invoke(reviewService, dto));
     }
 
-    // @Test
-    // @DisplayName("getReviewsByUserId retorna lista de reseñas del usuario")
-    // void getReviewsByUserId_returnsList() {
-    //     ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
-    //     ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
-    //     when(reviewRepository.findByUser_IdUser(2L)).thenReturn(List.of(r));
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class),
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.user.UserEntity.class)
-    //     )).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class)
-    //     )).thenReturn(dto);
-    //     List<ReviewResponseDTO> result = reviewService.getReviewsByUserId(2L);
-    //     assertThat(result, hasSize(1));
-    //     assertThat(result.get(0), is(dto));
-    // }
+    @Test
+    @DisplayName("getReviewsByUserId retorna lista de reseñas del usuario")
+    void getReviewsByUserId_returnsList() {
+        UserEntity currentUser = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+        
+        when(reviewRepository.findByUser_IdUser(2L)).thenReturn(List.of(r));
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(currentUser));
+        lenient().when(reviewMapper.reviewEntityToReviewResponseDTO(any(), any())).thenReturn(dto);
+        
+        List<ReviewResponseDTO> result = reviewService.getReviewsByUserId(2L);
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0), is(dto));
+    }
 
-    // @Test
-    // @DisplayName("getReviewsByContent retorna lista de reseñas del contenido")
-    // void getReviewsByContent_returnsList() {
-    //     ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
-    //     ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
-    //     when(reviewRepository.findByContentTypeAndContentId(ContentType.MOVIE, "MOV123")).thenReturn(List.of(r));
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
-    //     List<ReviewResponseDTO> result = reviewService.getReviewsByContent(ContentType.MOVIE, "MOV123");
-    //     assertThat(result, hasSize(1));
-    //     assertThat(result.get(0), is(dto));
-    // }
+    @Test
+    @DisplayName("getReviewsByContent retorna lista de reseñas del contenido")
+    void getReviewsByContent_returnsList() {
+        UserEntity currentUser = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+        
+        when(reviewRepository.findByContentTypeAndContentId(ContentType.MOVIE, "MOV123")).thenReturn(List.of(r));
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(currentUser));
+        lenient().when(reviewMapper.reviewEntityToReviewResponseDTO(any(), any())).thenReturn(dto);
+        
+        List<ReviewResponseDTO> result = reviewService.getReviewsByContent(ContentType.MOVIE, "MOV123");
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0), is(dto));
+    }
 
     @Test
     @DisplayName("getAverageRatingByContent retorna el promedio correcto")
@@ -330,41 +325,38 @@ class ReviewServiceImplTest {
         verify(reviewRepository).save(review);
     }
 
-    // @Test
-    // @DisplayName("getEntities retorna lista de reseñas")
-    // void getEntities_returnsList() {
-    //     ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
-    //     ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+    @Test
+    @DisplayName("getEntities retorna lista de reseñas")
+    void getEntities_returnsList() {
+        UserEntity currentUser = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
         
-    //     when(reviewRepository.findAll()).thenReturn(List.of(r));
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class),
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.user.UserEntity.class)
-    //     )).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class)
-    //     )).thenReturn(dto);
-    //     List<ReviewResponseDTO> result = reviewService.getEntities();
-    //     assertThat(result, hasSize(1));
-    //     assertThat(result.get(0), is(dto));
-    // }
+        when(reviewRepository.findAll()).thenReturn(List.of(r));
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(currentUser));
+        lenient().when(reviewMapper.reviewEntityToReviewResponseDTO(
+            any(), 
+            any())).thenReturn(dto);
+        
+        List<ReviewResponseDTO> result = reviewService.getEntities();
+        assertThat(result, hasSize(1));
+        assertThat(result.get(0), is(dto));
+    }
 
-    // @Test
-    // @DisplayName("getByID retorna la reseña esperada")
-    // void getByID_returnsReview() {
-    //     ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
-    //     ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
-    //     when(reviewRepository.findById(1L)).thenReturn(Optional.of(r));
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(r)).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class),
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.user.UserEntity.class)
-    //     )).thenReturn(dto);
-    //     when(reviewMapper.reviewEntityToReviewResponseDTO(
-    //         org.mockito.ArgumentMatchers.any(dev.ivan.reviewverso_back.reviews.ReviewEntity.class)
-    //     )).thenReturn(dto);
-    //     ReviewResponseDTO result = reviewService.getByID(1L);
-    //     assertThat(result, is(dto));
-    // }
+    @Test
+    @DisplayName("getByID retorna la reseña esperada")
+    void getByID_returnsReview() {
+        UserEntity currentUser = UserEntity.builder().idUser(1L).userName("usuario1").build();
+        ReviewEntity r = ReviewEntity.builder().idReview(1L).build();
+        ReviewResponseDTO dto = mock(ReviewResponseDTO.class);
+        
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(r));
+        when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(currentUser));
+        lenient().when(reviewMapper.reviewEntityToReviewResponseDTO(
+            any(), 
+            any())).thenReturn(dto);
+        
+        ReviewResponseDTO result = reviewService.getByID(1L);
+        assertThat(result, is(dto));
+    }
 }
