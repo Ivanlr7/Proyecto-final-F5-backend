@@ -17,6 +17,8 @@ public record ReviewResponseDTO(
         String reviewText,
         Double rating,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        int likeCount,
+        boolean likedByCurrentUser
 ) {
 }

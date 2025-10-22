@@ -1,5 +1,6 @@
 package dev.ivan.reviewverso_back.reviews.service;
 
+
 import dev.ivan.reviewverso_back.reviews.ReviewEntity;
 import dev.ivan.reviewverso_back.reviews.ReviewRepository;
 import dev.ivan.reviewverso_back.reviews.dtos.ReviewMapper;
@@ -23,6 +24,29 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
+    @Override
+    @Transactional
+    public void likeReview(Long reviewId, UserEntity user) {
+        ReviewEntity review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("Reseña no encontrada con id: " + reviewId));
+        if (review.getLikedByUsers().contains(user)) {
+            return; // Ya ha dado like
+        }
+        review.getLikedByUsers().add(user);
+        reviewRepository.save(review);
+    }
+
+    @Override
+    @Transactional
+    public void unlikeReview(Long reviewId, UserEntity user) {
+        ReviewEntity review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewNotFoundException("Reseña no encontrada con id: " + reviewId));
+        if (!review.getLikedByUsers().contains(user)) {
+            return; // No había like
+        }
+        review.getLikedByUsers().remove(user);
+        reviewRepository.save(review);
+    }
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
@@ -85,18 +109,22 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
+
     @Override
     public List<ReviewResponseDTO> getEntities() {
+        UserEntity currentUser = getCurrentUserOrNull();
         return reviewRepository.findAll().stream()
-                .map(reviewMapper::reviewEntityToReviewResponseDTO)
+                .map(r -> reviewMapper.reviewEntityToReviewResponseDTO(r, currentUser))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public ReviewResponseDTO getByID(Long id) {
         ReviewEntity review = reviewRepository.findById(id)
                 .orElseThrow(() -> new ReviewNotFoundException("Reseña no encontrada con id: " + id));
-        return reviewMapper.reviewEntityToReviewResponseDTO(review);
+        UserEntity currentUser = getCurrentUserOrNull();
+        return reviewMapper.reviewEntityToReviewResponseDTO(review, currentUser);
     }
 
     @Override
@@ -138,18 +166,34 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.deleteById(id);
     }
 
+
     @Override
     public List<ReviewResponseDTO> getReviewsByUserId(Long userId) {
+        UserEntity currentUser = getCurrentUserOrNull();
         return reviewRepository.findByUser_IdUser(userId).stream()
-                .map(reviewMapper::reviewEntityToReviewResponseDTO)
+                .map(r -> reviewMapper.reviewEntityToReviewResponseDTO(r, currentUser))
                 .collect(Collectors.toList());
     }
 
+
     @Override
     public List<ReviewResponseDTO> getReviewsByContent(ContentType contentType, String contentId) {
+        UserEntity currentUser = getCurrentUserOrNull();
         return reviewRepository.findByContentTypeAndContentId(contentType, contentId).stream()
-                .map(reviewMapper::reviewEntityToReviewResponseDTO)
+                .map(r -> reviewMapper.reviewEntityToReviewResponseDTO(r, currentUser))
                 .collect(Collectors.toList());
+    }
+
+    private UserEntity getCurrentUserOrNull() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
+                return null;
+            }
+            return userRepository.findByUserName(authentication.getName()).orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

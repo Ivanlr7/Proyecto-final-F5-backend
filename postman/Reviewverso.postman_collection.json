@@ -248,6 +248,34 @@
               "path": ["reviews",":id"]
             }
           }
+        },
+        {
+          "name": "Dar like a reseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", ":id", "like"]
+            }
+          }
+        },
+        {
+          "name": "Quitar like a reseña",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reviews/:id/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", ":id", "like"]
+            }
+          }
         }
       ]
     }

@@ -17,6 +17,7 @@ import dev.ivan.reviewverso_back.profile.ProfileEntity;
 @AllArgsConstructor
 @Builder
 public class UserEntity {
+    
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +41,8 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewEntity> reviews;
+
+    @ManyToMany(mappedBy = "likedByUsers")
+    @Builder.Default
+    private Set<ReviewEntity> likedReviews = new java.util.HashSet<>();
 }

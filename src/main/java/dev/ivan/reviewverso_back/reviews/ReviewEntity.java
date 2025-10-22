@@ -10,6 +10,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "reviews")
 @Getter
@@ -55,4 +58,13 @@ public class ReviewEntity {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToMany
+    @JoinTable(
+        name = "review_likes",
+        joinColumns = @JoinColumn(name = "review_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @Builder.Default
+    private Set<UserEntity> likedByUsers = new HashSet<>();
 }

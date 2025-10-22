@@ -6,9 +6,14 @@ import dev.ivan.reviewverso_back.reviews.enums.ContentType;
 import dev.ivan.reviewverso_back.reviews.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import dev.ivan.reviewverso_back.user.UserEntity;
+import dev.ivan.reviewverso_back.user.UserRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +25,7 @@ import java.util.Map;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> createReview(@Valid @RequestBody ReviewRequestDTO reviewRequest) {
@@ -82,5 +88,25 @@ public class ReviewController {
     public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
         reviewService.deleteEntity(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likeReview(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserEntity user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
+        reviewService.likeReview(id, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<Void> unlikeReview(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        UserEntity user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
+        reviewService.unlikeReview(id, user);
+        return ResponseEntity.ok().build();
     }
 }

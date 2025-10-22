@@ -11,7 +11,12 @@ public class ReviewMapper {
     @Value("${base-url}")
     private String baseUrl;
 
+
     public ReviewResponseDTO reviewEntityToReviewResponseDTO(ReviewEntity review) {
+        return reviewEntityToReviewResponseDTO(review, null);
+    }
+
+    public ReviewResponseDTO reviewEntityToReviewResponseDTO(ReviewEntity review, UserEntity currentUser) {
         String profileImageUrl;
         String imagePath = "/api/v1/files/images/";
         if (review.getUser() != null && review.getUser().getProfile() != null) {
@@ -23,6 +28,11 @@ public class ReviewMapper {
             }
         } else {
             profileImageUrl = baseUrl + imagePath + "default.png";
+        }
+        int likeCount = review.getLikedByUsers() != null ? review.getLikedByUsers().size() : 0;
+        boolean likedByCurrentUser = false;
+        if (currentUser != null && review.getLikedByUsers() != null) {
+            likedByCurrentUser = review.getLikedByUsers().contains(currentUser);
         }
         return new ReviewResponseDTO(
                 review.getIdReview(),
@@ -36,7 +46,9 @@ public class ReviewMapper {
                 review.getReviewText(),
                 review.getRating(),
                 review.getCreatedAt(),
-                review.getUpdatedAt()
+                review.getUpdatedAt(),
+                likeCount,
+                likedByCurrentUser
         );
     }
 

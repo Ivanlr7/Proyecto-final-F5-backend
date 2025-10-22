@@ -58,6 +58,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews").permitAll()
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/reviews").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews/*/like").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/*/like").hasAnyRole("ADMIN","USER")
                         .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
                         .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
                      
