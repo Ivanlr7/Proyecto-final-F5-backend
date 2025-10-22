@@ -51,6 +51,31 @@ class ReviewMapperTest {
         assertEquals(ContentType.MOVIE, dto.contentType());
     }
 
+        @Test
+        void testReviewEntityToReviewResponseDTO_likeCount_and_likedByCurrentUser() {
+                UserEntity user1 = UserEntity.builder().idUser(1L).userName("user1").build();
+                UserEntity user2 = UserEntity.builder().idUser(2L).userName("user2").build();
+                UserEntity user3 = UserEntity.builder().idUser(3L).userName("user3").build();
+                ReviewEntity review = ReviewEntity.builder().idReview(100L).user(user1).build();
+                review.getLikedByUsers().add(user2);
+                review.getLikedByUsers().add(user3);
+
+                // When currentUser is user2, likedByCurrentUser should be true
+                ReviewResponseDTO dtoLiked = reviewMapper.reviewEntityToReviewResponseDTO(review, user2);
+                assertEquals(2, dtoLiked.likeCount());
+                assertTrue(dtoLiked.likedByCurrentUser());
+
+                // When currentUser is user1 (author, not in likedByUsers), likedByCurrentUser should be false
+                ReviewResponseDTO dtoNotLiked = reviewMapper.reviewEntityToReviewResponseDTO(review, user1);
+                assertEquals(2, dtoNotLiked.likeCount());
+                assertFalse(dtoNotLiked.likedByCurrentUser());
+
+                // When currentUser is null, likedByCurrentUser should be false
+                ReviewResponseDTO dtoNull = reviewMapper.reviewEntityToReviewResponseDTO(review, null);
+                assertEquals(2, dtoNull.likeCount());
+                assertFalse(dtoNull.likedByCurrentUser());
+        }
+
     @Test
     void testReviewEntityToReviewResponseDTO_noProfileImage() {
         ProfileEntity profile = new ProfileEntity();

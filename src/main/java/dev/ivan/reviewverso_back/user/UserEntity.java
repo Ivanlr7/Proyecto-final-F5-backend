@@ -17,7 +17,20 @@ import dev.ivan.reviewverso_back.profile.ProfileEntity;
 @AllArgsConstructor
 @Builder
 public class UserEntity {
-    
+
+      //Lógica para las ids de usuario en el set de likes
+        @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return idUser != null && idUser.equals(that.idUser);
+    }
+
+    @Override
+    public int hashCode() {
+        return idUser != null ? idUser.hashCode() : 0;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,4 +58,7 @@ public class UserEntity {
     @ManyToMany(mappedBy = "likedByUsers")
     @Builder.Default
     private Set<ReviewEntity> likedReviews = new java.util.HashSet<>();
+
+  
+    
 }

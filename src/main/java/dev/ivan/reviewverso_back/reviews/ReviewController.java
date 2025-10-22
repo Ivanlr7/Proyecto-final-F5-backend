@@ -1,5 +1,6 @@
 package dev.ivan.reviewverso_back.reviews;
 
+import dev.ivan.reviewverso_back.implementations.IReviewService;
 import dev.ivan.reviewverso_back.reviews.dtos.ReviewRequestDTO;
 import dev.ivan.reviewverso_back.reviews.dtos.ReviewResponseDTO;
 import dev.ivan.reviewverso_back.reviews.enums.ContentType;
@@ -24,11 +25,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReviewController {
 
-    private final ReviewService reviewService;
+    private final IReviewService<ReviewResponseDTO, ReviewRequestDTO> reviewService;
+    private final ReviewService reviewLikeService;
     private final UserRepository userRepository;
 
     @PostMapping
-    public ResponseEntity<ReviewResponseDTO> createReview(@Valid @RequestBody ReviewRequestDTO reviewRequest) {
+    public ResponseEntity<ReviewResponseDTO> createReview(@RequestBody ReviewRequestDTO reviewRequest) {
         ReviewResponseDTO createdReview = reviewService.createEntity(reviewRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReview);
     }
@@ -45,37 +47,6 @@ public class ReviewController {
         return ResponseEntity.ok(review);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByUser(@PathVariable Long userId) {
-        List<ReviewResponseDTO> reviews = reviewService.getReviewsByUserId(userId);
-        return ResponseEntity.ok(reviews);
-    }
-
-    @GetMapping("/content")
-    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByContent(
-            @RequestParam ContentType contentType,
-            @RequestParam String contentId) {
-        List<ReviewResponseDTO> reviews = reviewService.getReviewsByContent(contentType, contentId);
-        return ResponseEntity.ok(reviews);
-    }
-
-    @GetMapping("/content/stats")
-    public ResponseEntity<Map<String, Object>> getContentStats(
-            @RequestParam ContentType contentType,
-            @RequestParam String contentId) {
-        
-        Double averageRating = reviewService.getAverageRatingByContent(contentType, contentId);
-        Long totalReviews = reviewService.getTotalReviewsByContent(contentType, contentId);
-        
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("contentType", contentType);
-        stats.put("contentId", contentId);
-        stats.put("averageRating", averageRating);
-        stats.put("totalReviews", totalReviews);
-        
-        return ResponseEntity.ok(stats);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ReviewResponseDTO> updateReview(
             @PathVariable Long id,
@@ -90,13 +61,41 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByUser(@PathVariable Long userId) {
+        List<ReviewResponseDTO> reviews = ((ReviewService)reviewService).getReviewsByUserId(userId);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/content")
+    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByContent(
+            @RequestParam ContentType contentType,
+            @RequestParam String contentId) {
+        List<ReviewResponseDTO> reviews = ((ReviewService)reviewService).getReviewsByContent(contentType, contentId);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/content/stats")
+    public ResponseEntity<Map<String, Object>> getContentStats(
+            @RequestParam ContentType contentType,
+            @RequestParam String contentId) {
+        Double averageRating = ((ReviewService)reviewService).getAverageRatingByContent(contentType, contentId);
+        Long totalReviews = ((ReviewService)reviewService).getTotalReviewsByContent(contentType, contentId);
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("contentType", contentType);
+        stats.put("contentId", contentId);
+        stats.put("averageRating", averageRating);
+        stats.put("totalReviews", totalReviews);
+        return ResponseEntity.ok(stats);
+    }
+
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> likeReview(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         UserEntity user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
-        reviewService.likeReview(id, user);
+        reviewLikeService.likeReview(id, user);
         return ResponseEntity.ok().build();
     }
 
@@ -106,7 +105,7 @@ public class ReviewController {
         String username = authentication.getName();
         UserEntity user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
-        reviewService.unlikeReview(id, user);
+        reviewLikeService.unlikeReview(id, user);
         return ResponseEntity.ok().build();
     }
 }

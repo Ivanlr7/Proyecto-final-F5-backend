@@ -42,4 +42,53 @@ class ReviewEntityTest {
         assertThat(review.getCreatedAt(), is(notNullValue()));
         assertThat(review.getUpdatedAt(), is(notNullValue()));
     }
+
+    @Test
+    void likedByUsers_should_add_and_remove_users_correctly() {
+        UserEntity user1 = UserEntity.builder().idUser(1L).userName("user1").build();
+        UserEntity user2 = UserEntity.builder().idUser(2L).userName("user2").build();
+        ReviewEntity review = ReviewEntity.builder().idReview(20L).build();
+
+        // Initially empty
+        assertThat(review.getLikedByUsers(), is(empty()));
+
+        // Add user1
+        review.getLikedByUsers().add(user1);
+        assertThat(review.getLikedByUsers(), contains(user1));
+
+        // Add user2
+        review.getLikedByUsers().add(user2);
+        assertThat(review.getLikedByUsers(), containsInAnyOrder(user1, user2));
+
+        // Remove user1
+        review.getLikedByUsers().remove(user1);
+        assertThat(review.getLikedByUsers(), contains(user2));
+    }
+
+    @Test
+    void likeCount_should_reflect_likedByUsers_size() {
+        UserEntity user1 = UserEntity.builder().idUser(1L).userName("user1").build();
+        UserEntity user2 = UserEntity.builder().idUser(2L).userName("user2").build();
+        ReviewEntity review = ReviewEntity.builder().idReview(30L).build();
+
+        assertThat(review.getLikedByUsers().size(), is(0));
+        review.getLikedByUsers().add(user1);
+        assertThat(review.getLikedByUsers().size(), is(1));
+        review.getLikedByUsers().add(user2);
+        assertThat(review.getLikedByUsers().size(), is(2));
+        review.getLikedByUsers().remove(user1);
+        assertThat(review.getLikedByUsers().size(), is(1));
+    }
+
+    @Test
+    void likedByUsers_should_not_duplicate_users_with_same_id() {
+        UserEntity user1a = UserEntity.builder().idUser(1L).userName("user1").build();
+        UserEntity user1b = UserEntity.builder().idUser(1L).userName("user1").build();
+        ReviewEntity review = ReviewEntity.builder().idReview(40L).build();
+
+        review.getLikedByUsers().add(user1a);
+        review.getLikedByUsers().add(user1b); // Should not duplicate
+        assertThat(review.getLikedByUsers().size(), is(1));
+        assertThat(review.getLikedByUsers(), contains(user1a));
+    }
 }
