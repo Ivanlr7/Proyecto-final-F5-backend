@@ -24,7 +24,7 @@ class FileStorageServiceTest {
 
     @AfterEach
     void cleanUp() throws IOException {
-        // Borra todos los archivos creados en uploads
+   
         Files.walk(Path.of(uploadDir))
                 .filter(Files::isRegularFile)
                 .forEach(path -> path.toFile().delete());
