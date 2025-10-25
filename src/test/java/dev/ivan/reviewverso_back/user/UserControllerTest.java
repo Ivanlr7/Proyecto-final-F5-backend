@@ -72,15 +72,14 @@ class UserControllerTest {
         when(userRepository.findByUserName("admin")).thenReturn(Optional.of(admin));
         when(userRepository.findByUserName("other")).thenReturn(Optional.of(other));
         when(userService.getByID(1L)).thenReturn(mock(UserResponseDTO.class));
-        // Admin puede acceder a cualquier usuario
+      
         Authentication adminAuth = mockAuth(99L, "admin", true);
         ResponseEntity<UserResponseDTO> adminResp = userController.getUserById(1L, adminAuth);
         assertThat(adminResp.getStatusCode().value(), is(200));
-        // Self puede acceder a sí mismo
+
         Authentication selfAuth = mockAuth(1L, "u", false);
         ResponseEntity<UserResponseDTO> selfResp = userController.getUserById(1L, selfAuth);
         assertThat(selfResp.getStatusCode().value(), is(200));
-        // Otro usuario no puede acceder
         Authentication otherAuth = mockAuth(2L, "other", false);
         try {
             userController.getUserById(1L, otherAuth);
