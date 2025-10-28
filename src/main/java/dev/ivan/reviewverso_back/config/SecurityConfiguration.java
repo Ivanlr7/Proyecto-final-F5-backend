@@ -54,7 +54,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
                 
                         .requestMatchers(HttpMethod.GET, endpoint + "/files/**").permitAll()
-                        
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/files/images/**").hasAnyRole("ADMIN", "USER")
+                
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews").permitAll()
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/reviews").hasAnyRole("ADMIN","USER")

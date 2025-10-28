@@ -15,6 +15,23 @@ import java.net.MalformedURLException;
 @RequiredArgsConstructor
 public class FileController {
 
+    // Endpoint para sobrescribir una imagen existente
+    @PutMapping("/images/{fileName}")
+    public ResponseEntity<?> overwriteImage(
+            @PathVariable String fileName,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            boolean overwritten = fileStorageService.overwriteFile(fileName, file);
+            if (overwritten) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al sobrescribir la imagen");
+        }
+    }
+
     private final FileStorageService fileStorageService;
 
 

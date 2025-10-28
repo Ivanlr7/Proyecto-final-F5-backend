@@ -103,6 +103,26 @@
           }
         },
         {
+          "name": "Editar imagen de usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/files/images/:fileName",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "images", ":fileName"]
+            }
+          }
+        },
+        {
           "name": "Delete user",
           "request": {
             "method": "DELETE",

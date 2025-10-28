@@ -14,6 +14,15 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService {
+    // Sobrescribe un archivo existente
+    public boolean overwriteFile(String fileName, MultipartFile file) throws IOException {
+        Path filePath = Paths.get(uploadDir, fileName);
+        if (Files.exists(filePath)) {
+            file.transferTo(filePath); // Sobrescribe el archivo
+            return true;
+        }
+        return false;
+    }
     private final String uploadDir = "uploads";
 
     public String storeFile(MultipartFile file) throws IOException {
