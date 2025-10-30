@@ -8,12 +8,14 @@ import dev.ivan.reviewverso_back.user.dtos.UserMapper;
 import dev.ivan.reviewverso_back.user.exceptions.UserNotFoundException;
 import dev.ivan.reviewverso_back.role.RoleRepository;
 import dev.ivan.reviewverso_back.role.RoleEntity;
+import dev.ivan.reviewverso_back.file.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -26,6 +28,8 @@ class UserServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private RoleRepository roleRepository;
+    @Mock
+    private FileStorageService fileStorageService;
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -75,11 +79,11 @@ class UserServiceImplTest {
         when(dto.password()).thenReturn("123");
         when(dto.profileImage()).thenReturn(null);
         when(dto.roles()).thenReturn(Set.of("USER"));
-        var resp = userService.updateEntity(1L, dto);
+        var resp = userService.updateEntity(1L, dto, null);
         assertThat(resp, notNullValue());
         when(userRepository.findById(2L)).thenReturn(Optional.empty());
         try {
-            userService.updateEntity(2L, dto);
+            userService.updateEntity(2L, dto, null);
         } catch (UserNotFoundException ex) {
             assertThat(ex.getMessage(), containsString("Usuario no encontrado"));
             return;
@@ -118,5 +122,59 @@ class UserServiceImplTest {
         when(userRepository.findByUserName("no")).thenReturn(Optional.empty());
         assertThat(userService.findByEmail("no@no.com").isEmpty(), is(true));
         assertThat(userService.findByUserName("no").isEmpty(), is(true));
+    }
+
+    @Test
+    @DisplayName("updateEntity con profileImage como archivo guarda la imagen")
+    void updateEntity_withProfileImageFile() throws Exception {
+        UserEntity user = UserEntity.builder()
+            .idUser(1L)
+            .userName("u")
+            .roles(new HashSet<>())
+            .build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(mock(RoleEntity.class)));
+        when(userRepository.save(any())).thenReturn(user);
+        when(fileStorageService.storeFile(any())).thenReturn("uuid-imagen.jpg");
+        
+        UserRequestDTO dto = mock(UserRequestDTO.class);
+        when(dto.userName()).thenReturn(null);
+        when(dto.email()).thenReturn(null);
+        when(dto.password()).thenReturn(null);
+        when(dto.profileImage()).thenReturn(null);
+        when(dto.roles()).thenReturn(null);
+        
+        MultipartFile mockFile = mock(MultipartFile.class);
+        when(mockFile.isEmpty()).thenReturn(false);
+        
+        var resp = userService.updateEntity(1L, dto, mockFile);
+        
+        assertThat(resp, notNullValue());
+        verify(fileStorageService, times(1)).storeFile(mockFile);
+    }
+
+    @Test
+    @DisplayName("updateEntity con profileImage como string actualiza el perfil")
+    void updateEntity_withProfileImageString() throws Exception {
+        UserEntity user = UserEntity.builder()
+            .idUser(1L)
+            .userName("u")
+            .roles(new HashSet<>())
+            .build();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(mock(RoleEntity.class)));
+        when(userRepository.save(any())).thenReturn(user);
+        
+        UserRequestDTO dto = mock(UserRequestDTO.class);
+        when(dto.userName()).thenReturn(null);
+        when(dto.email()).thenReturn(null);
+        when(dto.password()).thenReturn(null);
+        when(dto.profileImage()).thenReturn("imagen-existente.jpg");
+        when(dto.roles()).thenReturn(null);
+        
+        var resp = userService.updateEntity(1L, dto, null);
+        
+        assertThat(resp, notNullValue());
+        verify(fileStorageService, never()).storeFile(any());
     }
 }

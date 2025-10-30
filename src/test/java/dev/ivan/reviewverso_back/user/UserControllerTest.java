@@ -100,20 +100,20 @@ class UserControllerTest {
         when(userRepository.findByUserName("u")).thenReturn(Optional.of(user));
         when(userRepository.findByUserName("admin")).thenReturn(Optional.of(admin));
         when(userRepository.findByUserName("other")).thenReturn(Optional.of(other));
-        when(userService.updateEntity(eq(1L), any())).thenReturn(mock(UserResponseDTO.class));
+        when(userService.updateEntity(eq(1L), any(), any())).thenReturn(mock(UserResponseDTO.class));
         UserRequestDTO dto = mock(UserRequestDTO.class);
         // Admin puede actualizar cualquier usuario
         Authentication adminAuth = mockAuth(99L, "admin", true);
-        ResponseEntity<UserResponseDTO> adminResp = userController.updateUser(1L, dto, adminAuth);
+        ResponseEntity<UserResponseDTO> adminResp = userController.updateUser(1L, dto, null, adminAuth);
         assertThat(adminResp.getStatusCode().value(), is(200));
         // Self puede actualizarse
         Authentication selfAuth = mockAuth(1L, "u", false);
-        ResponseEntity<UserResponseDTO> selfResp = userController.updateUser(1L, dto, selfAuth);
+        ResponseEntity<UserResponseDTO> selfResp = userController.updateUser(1L, dto, null, selfAuth);
         assertThat(selfResp.getStatusCode().value(), is(200));
         // Otro usuario no puede actualizar
         Authentication otherAuth = mockAuth(2L, "other", false);
         try {
-            userController.updateUser(1L, dto, otherAuth);
+            userController.updateUser(1L, dto, null, otherAuth);
         } catch (UserAccessDeniedException ex) {
             assertThat(ex.getMessage(), containsString("No puedes editar"));
             return;
