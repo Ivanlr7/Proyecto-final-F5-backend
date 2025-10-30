@@ -97,8 +97,16 @@
           "name": "Update user",
           "request": {
             "method": "PUT",
-            "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
-            "body": { "mode": "raw", "raw": "{ \"userName\": \"nuevo\", \"email\": \"nuevo@example.com\" }" },
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "data", "type": "text", "value": "{\"userName\":\"nuevo\",\"email\":\"nuevo@example.com\",\"roles\":[]}" },
+                { "key": "profileImage", "type": "file", "src": "" }
+              ]
+            },
             "url": { "raw": "{{baseUrl}}/users/:id", "host": ["{{baseUrl}}"], "path": ["users",":id"] }
           }
         },

@@ -14,12 +14,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import dev.ivan.reviewverso_back.file.FileStorageService;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final FileStorageService fileStorageService;
 
     @Override
     public List<UserResponseDTO> getEntities() {
@@ -35,9 +38,10 @@ public class UserServiceImpl implements UserService {
         return new UserMapper(roleRepository).userEntityToUserResponseDto(user);
     }
 
+
     @Override
     @Transactional
-    public UserResponseDTO updateEntity(Long id, UserRequestDTO dto) {
+    public UserResponseDTO updateEntity(Long id, UserRequestDTO dto, org.springframework.web.multipart.MultipartFile profileImage) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con id: " + id));
 
@@ -45,7 +49,25 @@ public class UserServiceImpl implements UserService {
         if (dto.email() != null) user.setEmail(dto.email());
         if (dto.password() != null) user.setPassword(dto.password());
 
-        if (dto.profileImage() != null) {
+      
+        if (profileImage != null && !profileImage.isEmpty()) {
+      
+            String fileName;
+            try {
+                fileName = fileStorageService.storeFile(profileImage);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Error al guardar el archivo de imagen de perfil", e);
+            }
+            if (user.getProfile() != null) {
+                user.getProfile().setProfileImage(fileName);
+            } else {
+                var profile = new dev.ivan.reviewverso_back.profile.ProfileEntity();
+                profile.setProfileImage(fileName);
+                profile.setUser(user);
+                user.setProfile(profile);
+            }
+        } else if (dto.profileImage() != null) {
+            // Si no hay archivo pero sí string, actualiza como antes
             if (user.getProfile() != null) {
                 user.getProfile().setProfileImage(dto.profileImage());
             } else {
@@ -66,6 +88,12 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         return new UserMapper(roleRepository).userEntityToUserResponseDto(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDTO updateEntity(Long id, UserRequestDTO dto) {
+        return updateEntity(id, dto, null);
     }
 
     @Override

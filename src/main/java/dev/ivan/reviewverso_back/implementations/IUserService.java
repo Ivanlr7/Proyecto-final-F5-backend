@@ -7,6 +7,7 @@ public interface IUserService  <T, S> {
     public List<T> getEntities();
     public T getByID(Long id);
     public T updateEntity(Long id, S dto);
+    public T updateEntity(Long id, S dto, org.springframework.web.multipart.MultipartFile profileImage);
     public void deleteEntity(Long id);
     
 }

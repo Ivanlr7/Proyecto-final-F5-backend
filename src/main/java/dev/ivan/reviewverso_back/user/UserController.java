@@ -9,15 +9,18 @@ import dev.ivan.reviewverso_back.implementations.IUserService;
 import dev.ivan.reviewverso_back.role.RoleEntity;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -90,12 +93,14 @@ public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id, Princi
     return ResponseEntity.ok(userService.getByID(id));
 }
 
-   @PutMapping("/{id}")
+
+   @PutMapping( path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public ResponseEntity<UserResponseDTO> updateUser(
         @PathVariable Long id,
-        @RequestBody UserRequestDTO dto,
+        @RequestPart("data") UserRequestDTO dto,
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
         Principal principal) {
-
+        System.out.println("<------- "+profileImage);
     UserEntity currentUser = getCurrentUserEntity(principal);
     boolean isAdmin = hasRole(principal, "ADMIN");
 
@@ -103,7 +108,7 @@ public ResponseEntity<UserResponseDTO> updateUser(
         throw new UserAccessDeniedException("No puedes editar otro usuario");
     }
 
-    return ResponseEntity.ok(userService.updateEntity(id, dto));
+    return ResponseEntity.ok(userService.updateEntity(id, dto, profileImage));
 }
 
 @DeleteMapping("/{id}")
