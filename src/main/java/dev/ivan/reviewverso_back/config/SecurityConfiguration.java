@@ -64,6 +64,11 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
                         .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
                      
+                        .requestMatchers(HttpMethod.GET, endpoint + "/lists").permitAll()
+                        .requestMatchers(HttpMethod.GET, endpoint + "/lists/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, endpoint + "/lists").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/lists/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/lists/**").hasAnyRole("ADMIN","USER")
                         
                         .anyRequest().authenticated()
                 )

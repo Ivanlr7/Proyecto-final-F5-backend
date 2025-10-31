@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import dev.ivan.reviewverso_back.register.exceptions.*;
 import dev.ivan.reviewverso_back.user.exceptions.*;
 import dev.ivan.reviewverso_back.reviews.exceptions.*;
+import dev.ivan.reviewverso_back.lists.exceptions.*;
 
 
 @RestControllerAdvice
@@ -49,6 +50,16 @@ public ResponseEntity<GlobalExceptionResponseDTO> handleUserAccessDenied(UserAcc
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<GlobalExceptionResponseDTO> handleIllegalArgument(IllegalArgumentException ex) {
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+  }
+
+  @ExceptionHandler(ListNotFoundException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleListNotFound(ListNotFoundException ex) {
+    return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(ListAccessDeniedException.class)
+  public ResponseEntity<GlobalExceptionResponseDTO> handleListAccessDenied(ListAccessDeniedException ex) {
+    return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
   }
 
       private ResponseEntity<GlobalExceptionResponseDTO> buildResponse(HttpStatus status, String message) {

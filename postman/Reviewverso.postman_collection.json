@@ -306,6 +306,96 @@
           }
         }
       ]
+    },
+    {
+      "name": "Lists",
+      "item": [
+        {
+          "name": "Crear lista",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mis películas favoritas de 2024\",\n  \"description\": \"Una colección de las mejores películas que he visto este año\",\n  \"items\": [\n    {\n      \"contentType\": \"MOVIE\",\n      \"contentId\": \"550\",\n      \"apiSource\": \"TMDB\"\n    },\n    {\n      \"contentType\": \"MOVIE\",\n      \"contentId\": \"680\",\n      \"apiSource\": \"TMDB\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists"]
+            }
+          }
+        },
+        {
+          "name": "Obtener todas las listas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lists",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists"]
+            }
+          }
+        },
+        {
+          "name": "Obtener lista por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lists/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists",":id"]
+            }
+          }
+        },
+        {
+          "name": "Obtener listas por usuario",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/lists/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists","user",":userId"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar lista",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mis películas favoritas actualizadas\",\n  \"description\": \"Lista actualizada\",\n  \"items\": [\n    {\n      \"contentType\": \"MOVIE\",\n      \"contentId\": \"550\",\n      \"apiSource\": \"TMDB\"\n    },\n    {\n      \"contentType\": \"SERIES\",\n      \"contentId\": \"1234\",\n      \"apiSource\": \"TMDB\"\n    },\n    {\n      \"contentType\": \"VIDEOGAME\",\n      \"contentId\": \"5678\",\n      \"apiSource\": \"RAWG\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lists/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists",":id"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar lista",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lists/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["lists",":id"]
+            }
+          }
+        }
+      ]
     }
   ]
 }
