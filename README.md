@@ -431,13 +431,15 @@ reviewverso-back/
 
 The project implements several design patterns:
 
+- **DDD**: Domain-Driven Design
 - **DTO Pattern**: Separation between entities and data transfer objects
 - **Repository Pattern**: Data access abstraction
 - **Service Layer**: Business logic separation from controllers
 - **Mapper Pattern**: Conversion between DTOs and entities
 - **Exception Handling**: Centralized exception handling with `@ControllerAdvice`
 
-## Testing
+## Testing Coverage
+![alt text](image.png)
 
 ## Contact
 
