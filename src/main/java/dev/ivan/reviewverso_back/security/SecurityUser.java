@@ -62,7 +62,7 @@ public class SecurityUser implements UserDetails {
         return true;
     }
 
-    // Métodos adicionales para extraer información del usuario
+  
     public Long getUserId() {
         return user.getIdUser();
     }

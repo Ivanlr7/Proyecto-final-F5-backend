@@ -34,9 +34,6 @@ public class UserController {
     private final IUserService<UserResponseDTO, UserRequestDTO> userService;
     private final UserRepository userRepository;
 
-    /**
-     * Obtiene el ID del usuario desde el JWT
-     */
     private Long getUserIdFromJwt(Principal principal) {
         if (principal instanceof Authentication authentication) {
             if (authentication.getPrincipal() instanceof Jwt jwt) {
@@ -46,9 +43,7 @@ public class UserController {
         return null;
     }
 
-    /**
-     * Verifica si el usuario tiene un rol específico
-     */
+ 
     private boolean hasRole(Principal principal, String roleName) {
         if (principal instanceof Authentication authentication) {
             return authentication.getAuthorities().stream()
@@ -60,16 +55,14 @@ public class UserController {
         return false;
     }
 
-    /**
-     * Obtiene el usuario actual desde el JWT o por userName como fallback
-     */
+  
     private UserEntity getCurrentUserEntity(Principal principal) {
         Long userId = getUserIdFromJwt(principal);
         if (userId != null) {
             return userRepository.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
         }
-        // Fallback: buscar por userName
+  
         return userRepository.findByUserName(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
     }

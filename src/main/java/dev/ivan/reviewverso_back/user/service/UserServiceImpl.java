@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
                 user.setProfile(profile);
             }
         } else if (dto.profileImage() != null) {
-            // Si no hay archivo pero sí string, actualiza como antes
+       
             if (user.getProfile() != null) {
                 user.getProfile().setProfileImage(dto.profileImage());
             } else {

@@ -52,8 +52,7 @@ public class UserEntity {
 
         @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ListEntity> lists;
-
-      //Lógica para las ids de usuario en el set de likes
+    
         @Override
     public boolean equals(Object o) {
         if (this == o) return true;

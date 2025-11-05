@@ -47,18 +47,16 @@ public class ListEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    // Método helper para añadir items
     public void addItem(ListItemEntity item) {
         items.add(item);
         item.setList(this);
         item.setPosition(items.size() - 1);
     }
 
-    // Método helper para remover items
     public void removeItem(ListItemEntity item) {
         items.remove(item);
         item.setList(null);
-        // Reordenar posiciones
+  
         for (int i = 0; i < items.size(); i++) {
             items.get(i).setPosition(i);
         }

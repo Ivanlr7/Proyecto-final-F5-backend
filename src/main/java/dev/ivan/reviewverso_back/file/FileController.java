@@ -15,7 +15,7 @@ import java.net.MalformedURLException;
 @RequiredArgsConstructor
 public class FileController {
 
-    // Endpoint para sobrescribir una imagen existente
+
     @PutMapping("/images/{fileName}")
     public ResponseEntity<?> overwriteImage(
             @PathVariable String fileName,
@@ -34,20 +34,16 @@ public class FileController {
 
     private final FileStorageService fileStorageService;
 
-
- //Endpoint para servir imágenes
-
     @GetMapping("/images/{fileName}")
     public ResponseEntity<Resource> getImage(@PathVariable String fileName) {
         try {
             Resource resource = fileStorageService.loadFileAsResource(fileName);
-            
-            // Determinar el tipo de contenido
+ 
             String contentType = determineContentType(fileName);
             
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CACHE_CONTROL, "max-age=3600") // Cache por 1 hora
+                    .header(HttpHeaders.CACHE_CONTROL, "max-age=3600") 
                     .body(resource);
                     
         } catch (MalformedURLException e) {
@@ -58,17 +54,11 @@ public class FileController {
     }
 
    
-
-
-     // Endpoint para verificar si un archivo existe
-   
     @GetMapping("/exists/{fileName}")
     public ResponseEntity<Boolean> fileExists(@PathVariable String fileName) {
         boolean exists = fileStorageService.fileExists(fileName);
         return ResponseEntity.ok(exists);
     }
-
-    //Determina el tipo de contenido basado en la extensión del archivo
 
     private String determineContentType(String fileName) {
         String extension = "";

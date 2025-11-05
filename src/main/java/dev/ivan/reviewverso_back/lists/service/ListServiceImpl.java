@@ -61,7 +61,6 @@ public class ListServiceImpl implements ListService {
             throw new RuntimeException("No tienes permiso para editar esta lista");
         }
 
-        // Actualizar campos básicos
         if (dto.title() != null) {
             list.setTitle(dto.title());
         }
@@ -69,12 +68,9 @@ public class ListServiceImpl implements ListService {
             list.setDescription(dto.description());
         }
 
-        // Actualizar items si se proporcionan
         if (dto.items() != null) {
-            // Limpiar items existentes
             list.getItems().clear();
             
-            // Añadir nuevos items
             for (int i = 0; i < dto.items().size(); i++) {
                 var itemDto = dto.items().get(i);
                 ListItemEntity item = ListItemEntity.builder()

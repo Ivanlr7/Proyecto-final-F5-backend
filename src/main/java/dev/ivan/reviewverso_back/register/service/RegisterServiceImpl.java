@@ -39,10 +39,8 @@ public class RegisterServiceImpl implements RegisterService {
 			throw new RegisterIllegalArgumentException("El nombre de usuario ya está registrado");
 		}
 
-		// Hasheo de roles
 		String encodedPassword = passwordEncoder.encode(request.password());
 
-		// Asignación de roles
 		Set<RoleEntity> roles = new HashSet<>();
 		if (request.roles() != null && !request.roles().isEmpty()) {
 			for (String roleName : request.roles()) {

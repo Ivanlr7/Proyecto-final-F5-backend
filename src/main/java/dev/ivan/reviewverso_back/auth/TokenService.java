@@ -30,10 +30,10 @@ public class TokenService {
 
         Instant now = Instant.now();
 
-        // Recopilar roles del usuario autenticado
+      
         String roles = collectRoles(authentication);
         
-        // Obtener información adicional del usuario si es SecurityUser
+        
         Long userId = extractUserId(authentication);
         String email = extractEmail(authentication);
 
@@ -48,7 +48,7 @@ public class TokenService {
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
                 .claim("scope", roles);
         
-        // Agregar claims adicionales si están disponibles
+
         if (userId != null) {
             claimsBuilder.claim("userId", userId);
         }

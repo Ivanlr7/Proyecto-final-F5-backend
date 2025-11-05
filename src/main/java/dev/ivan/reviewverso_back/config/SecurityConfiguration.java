@@ -115,13 +115,13 @@ public class SecurityConfiguration {
         org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter = 
             new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter();
         
-        // Converter personalizado para authorities
+ 
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             String scope = jwt.getClaimAsString("scope");
             if (scope != null && !scope.isEmpty()) {
                 return java.util.Arrays.stream(scope.split(" "))
                     .map(role -> {
-                        // Convertir SCOPE_ROLE_USER a ROLE_USER para compatibilidad con hasRole()
+                        
                         if (role.startsWith("ROLE_")) {
                             return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
                         }

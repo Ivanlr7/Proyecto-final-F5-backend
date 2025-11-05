@@ -17,16 +17,6 @@ public class AuthController {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
 
-    // @PostMapping("/token")
-    // public ResponseEntity<?> token(Authentication authentication) {
-    //     try {
-    //         String token = tokenService.generateToken(authentication);
-    //         return ResponseEntity.ok(new AuthResponseDTO(token));
-    //     } catch (IllegalArgumentException e) {
-    //         return ResponseEntity.status(401).body("No autenticado: credenciales inválidas o faltantes");
-    //     }
-    // }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
@@ -54,6 +44,6 @@ public class AuthController {
         return ResponseEntity.ok().body("Sesión cerrada con éxito");
     }
 
-    // Record para el request de login
+
     public record LoginRequest(String identifier, String password) {}
 }

@@ -14,11 +14,11 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService {
-    // Sobrescribe un archivo existente
+
     public boolean overwriteFile(String fileName, MultipartFile file) throws IOException {
         Path filePath = Paths.get(uploadDir, fileName);
         if (Files.exists(filePath)) {
-            file.transferTo(filePath); // Sobrescribe el archivo
+            file.transferTo(filePath); 
             return true;
         }
         return false;
@@ -37,9 +37,6 @@ public class FileStorageService {
         file.transferTo(filePath);
         return fileName;
     }
-
-
-     //Recupera un archivo almacenado por su nombre
    
     public Resource loadFileAsResource(String fileName) throws MalformedURLException {
         Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
@@ -52,15 +49,13 @@ public class FileStorageService {
         }
     }
 
-    //Verifica si un archivo existe
+
      
     public boolean fileExists(String fileName) {
         Path filePath = Paths.get(uploadDir, fileName);
         return Files.exists(filePath);
     }
 
-   
-    //Elimina un archivo
  
     public boolean deleteFile(String fileName) {
         try {

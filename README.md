@@ -1,5 +1,43 @@
 # ReviewVerso Backend
 
+## 📑 Tabla de Contenido
+
+- [Introduction](#introduction)
+- [Functional Requirements](#functional-requirements)
+  - [User Management](#user-management)
+  - [Review System](#review-system)
+  - [List Management](#list-management)
+  - [File Management](#file-management)
+  - [Security Features](#security-features)
+- [Technologies](#technologies)
+  - [Core Framework](#core-framework)
+  - [Spring Boot Starters](#spring-boot-starters)
+  - [Database](#database)
+  - [Security & Authentication](#security--authentication)
+  - [Development Tools](#development-tools)
+  - [Testing](#testing)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+  - [1. Clone the Repository](#1-clone-the-repository)
+  - [2. Configure Database](#2-configure-database)
+  - [3. Configure Application Properties](#3-configure-application-properties)
+  - [4. Build the Project](#4-build-the-project)
+  - [5. Run the Application](#5-run-the-application)
+  - [6. Verify Installation](#6-verify-installation)
+  - [7. Run Tests](#7-run-tests)
+- [API Documentation](#api-documentation)
+  - [Authentication](#authentication)
+  - [Reviews](#reviews)
+  - [Lists](#lists)
+  - [Users & Profiles](#users--profiles)
+- [Database Diagrams](#database-diagrams)
+  - [Entity-Relationship (ER) Diagram](#entity-relationship-er-diagram)
+  - [Class Diagram - Domain Entities](#class-diagram---domain-entities)
+- [Project Structure](#project-structure)
+- [Design Patterns](#design-patterns)
+- [Testing Coverage](#testing-coverage)
+- [Contact](#contact)
+
 ## Introduction
 
 **ReviewVerso** is a comprehensive content review and list management platform that allows users to create reviews and curated lists of movies, series, books, and video games. The backend is built with Spring Boot 3.5.6 and provides a RESTful API with JWT authentication, integrating with external APIs like TMDB (The Movie Database), IGDB (Internet Game Database), and Open Library.
@@ -17,12 +55,12 @@ The platform enables users to:
 - **User Registration**: New users can register with username, email, and password
 - **Authentication**: JWT-based authentication system with role-based access control (USER, ADMIN)
 - **User Profiles**: Each user has a personalized profile with custom profile images
-- **Role Management**: Support for multiple roles per user with ManyToMany relationship
+- **Role Management**: Support for multiple roles per user 
 
 ### Review System
 - **Create Reviews**: Users can create reviews for movies, series, games, and books
 - **Review Details**: Each review includes title, text content, rating (0-10), content type, and API source
-- **Like System**: Users can like reviews from other users (ManyToMany relationship)
+- **Like System**: Users can like reviews from other users 
 - **Timestamps**: Automatic tracking of creation and update times
 - **User Ownership**: Reviews are associated with their creators
 
@@ -57,8 +95,6 @@ The platform enables users to:
 - **Spring Security**: Authentication and authorization
 - **Spring Web**: RESTful API development
 - **Spring OAuth2 Resource Server**: JWT token handling
-- **Spring Mail**: Email functionality
-- **Spring Validation**: Input validation with Jakarta Bean Validation
 
 ### Database
 - **MySQL**: Production database (via `spring.profiles.active=devmysql`)
@@ -215,8 +251,8 @@ The API is available at `http://localhost:8080/api/v1` with the following endpoi
 - `DELETE /api/v1/lists/{id}` - Delete list
 
 ### Users & Profiles
-- `GET /api/v1/users/profile` - Get current user profile
-- `PUT /api/v1/users/profile` - Update profile
+- `GET /api/v1/users/me` - Get current user profile
+- `PUT /api/v1/users/me` - Update profile
 - `POST /api/v1/files/upload` - Upload profile image
 
 ## Database Diagrams
@@ -431,7 +467,7 @@ reviewverso-back/
 
 The project implements several design patterns:
 
-- **DDD**: Domain-Driven Design
+- **Arquitecture**: By Features
 - **DTO Pattern**: Separation between entities and data transfer objects
 - **Repository Pattern**: Data access abstraction
 - **Service Layer**: Business logic separation from controllers
