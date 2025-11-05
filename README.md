@@ -1,6 +1,6 @@
 # ReviewVerso Backend
 
-## 📑 Tabla de Contenido
+## 📑 Table of contents
 
 - [Introduction](#introduction)
 - [Functional Requirements](#functional-requirements)
