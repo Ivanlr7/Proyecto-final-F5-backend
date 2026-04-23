@@ -47,36 +47,34 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/token").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/auth/logout").permitAll()
-                        
+
                         .requestMatchers(HttpMethod.GET, endpoint + "/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.DELETE, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").hasAnyRole("ADMIN","USER")
-                
+                        .requestMatchers(HttpMethod.GET, endpoint + "/users/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/users/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/users/**").hasAnyRole("ADMIN", "USER")
+
                         .requestMatchers(HttpMethod.GET, endpoint + "/files/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, endpoint + "/files/images/**").hasAnyRole("ADMIN", "USER")
-                
+
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews").permitAll()
                         .requestMatchers(HttpMethod.GET, endpoint + "/reviews/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews/*/like").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/*/like").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN","USER")
-                     
+                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, endpoint + "/reviews/*/like").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/*/like").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN", "USER")
+
                         .requestMatchers(HttpMethod.GET, endpoint + "/lists").permitAll()
                         .requestMatchers(HttpMethod.GET, endpoint + "/lists/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, endpoint + "/lists").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.PUT, endpoint + "/lists/**").hasAnyRole("ADMIN","USER")
-                        .requestMatchers(HttpMethod.DELETE, endpoint + "/lists/**").hasAnyRole("ADMIN","USER")
-                        
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers(HttpMethod.POST, endpoint + "/lists").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, endpoint + "/lists/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, endpoint + "/lists/**").hasAnyRole("ADMIN", "USER")
+
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt
-                    .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ))
+                        .decoder(jwtDecoder())
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .httpBasic(withDefaults());
 
         http.headers(header -> header.frameOptions(frame -> frame.sameOrigin()));
@@ -98,7 +96,8 @@ public class SecurityConfiguration {
 
     @Bean
     public org.springframework.security.authentication.AuthenticationManager authenticationManager(
-            org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration authConfig) throws Exception {
+            org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration authConfig)
+            throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
@@ -112,26 +111,24 @@ public class SecurityConfiguration {
      */
     @Bean
     public org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter jwtAuthenticationConverter() {
-        org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter = 
-            new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter();
-        
- 
+        org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter = new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter();
+
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
             String scope = jwt.getClaimAsString("scope");
             if (scope != null && !scope.isEmpty()) {
                 return java.util.Arrays.stream(scope.split(" "))
-                    .map(role -> {
-                        
-                        if (role.startsWith("ROLE_")) {
+                        .map(role -> {
+
+                            if (role.startsWith("ROLE_")) {
+                                return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
+                            }
                             return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
-                        }
-                        return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
-                    })
-                    .collect(java.util.stream.Collectors.toList());
+                        })
+                        .collect(java.util.stream.Collectors.toList());
             }
             return java.util.List.of();
         });
-        
+
         return converter;
     }
 
@@ -139,9 +136,10 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList("https://proyecto-final-f5-frontend-c5wl.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "multipart/form-data"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin",
+                "X-Requested-With", "multipart/form-data"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
