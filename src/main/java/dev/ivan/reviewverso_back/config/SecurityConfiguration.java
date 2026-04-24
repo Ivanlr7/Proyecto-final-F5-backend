@@ -64,6 +64,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, endpoint + "/reviews/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE, endpoint + "/reviews/**").hasAnyRole("ADMIN", "USER")
 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET, endpoint + "/lists").permitAll()
                         .requestMatchers(HttpMethod.GET, endpoint + "/lists/**").permitAll()
                         .requestMatchers(HttpMethod.POST, endpoint + "/lists").hasAnyRole("ADMIN", "USER")
@@ -106,9 +108,6 @@ public class SecurityConfiguration {
         return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
     }
 
-    /**
-     * Convierte los claims del JWT en authorities de Spring Security
-     */
     @Bean
     public org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter jwtAuthenticationConverter() {
         org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter = new org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter();
@@ -136,11 +135,13 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("https://proyecto-final-f5-frontend-c5wl.vercel.app"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin",
-                "X-Requested-With", "multipart/form-data"));
-
+        configuration.setAllowedOrigins(
+                Arrays.asList("https://proyecto-final-f5-frontend-c5wl.vercel.app", "http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // configuration.setAllowedHeaders(Arrays.asList("Authorization",
+        // "Content-Type", "Accept", "Origin",
+        // "X-Requested-With", "multipart/form-data"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
