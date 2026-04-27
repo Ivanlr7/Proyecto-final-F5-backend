@@ -137,7 +137,7 @@ public class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(
-                Arrays.asList("https://proyecto-final-f5-frontend-c5wl-caxzdq3b5-reviewverso.vercel.app"));
+                Arrays.asList("https://proyecto-final-f5-frontend-c5wl.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin",
                 "X-Requested-With", "multipart/form-data"));
