@@ -13,7 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import dev.ivan.reviewverso_back.file.FileStorageService;
+import dev.ivan.reviewverso_back.cloudinary.CloudinaryService;
+// import dev.ivan.reviewverso_back.file.FileStorageService;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,7 +25,8 @@ public class RegisterServiceImpl implements RegisterService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
-	private final FileStorageService fileStorageService;
+	private final CloudinaryService cloudinaryService;
+	// private final FileStorageService fileStorageService;
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
@@ -56,16 +58,20 @@ public class RegisterServiceImpl implements RegisterService {
 
 	
 
-		String imageFileName = null;
+		String imageUrl = null;
+		// String imageFileName = null;
 		if (profileImage != null && !profileImage.isEmpty()) {
 			try {
-				imageFileName = fileStorageService.storeFile(profileImage);
+				imageUrl = cloudinaryService.uploadImage(profileImage);
+				// imageFileName = fileStorageService.storeFile(profileImage);
 			} catch (IOException e) {
-				throw new RegisterIllegalArgumentException("Error al guardar la imagen de perfil", e);
+				throw new RegisterIllegalArgumentException("Error al subir la imagen de perfil a Cloudinary", e);
+				// throw new RegisterIllegalArgumentException("Error al guardar la imagen de perfil", e);
 			}
 		}
 		ProfileEntity profile = ProfileEntity.builder()
-				.profileImage(imageFileName)
+				.profileImage(imageUrl)
+				// .profileImage(imageFileName)
 				.build();
 
 		UserEntity user = UserEntity.builder()
@@ -85,4 +91,4 @@ public class RegisterServiceImpl implements RegisterService {
 	}
 }
 
-    
+

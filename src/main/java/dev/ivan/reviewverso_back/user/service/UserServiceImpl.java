@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import dev.ivan.reviewverso_back.file.FileStorageService;
+import dev.ivan.reviewverso_back.cloudinary.CloudinaryService;
+// import dev.ivan.reviewverso_back.file.FileStorageService;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final FileStorageService fileStorageService;
+    private final CloudinaryService cloudinaryService;
+    // private final FileStorageService fileStorageService;
 
     @Override
     public List<UserResponseDTO> getEntities() {
@@ -49,25 +51,29 @@ public class UserServiceImpl implements UserService {
         if (dto.email() != null) user.setEmail(dto.email());
         if (dto.password() != null) user.setPassword(dto.password());
 
-      
         if (profileImage != null && !profileImage.isEmpty()) {
-      
-            String fileName;
+
+            String imageUrl;
+            // String fileName;
             try {
-                fileName = fileStorageService.storeFile(profileImage);
+                imageUrl = cloudinaryService.uploadImage(profileImage);
+                // fileName = fileStorageService.storeFile(profileImage);
             } catch (java.io.IOException e) {
-                throw new RuntimeException("Error al guardar el archivo de imagen de perfil", e);
+                throw new RuntimeException("Error al subir la imagen de perfil a Cloudinary", e);
+                // throw new RuntimeException("Error al guardar el archivo de imagen de perfil", e);
             }
             if (user.getProfile() != null) {
-                user.getProfile().setProfileImage(fileName);
+                user.getProfile().setProfileImage(imageUrl);
+                // user.getProfile().setProfileImage(fileName);
             } else {
                 var profile = new dev.ivan.reviewverso_back.profile.ProfileEntity();
-                profile.setProfileImage(fileName);
+                profile.setProfileImage(imageUrl);
+                // profile.setProfileImage(fileName);
                 profile.setUser(user);
                 user.setProfile(profile);
             }
         } else if (dto.profileImage() != null) {
-       
+
             if (user.getProfile() != null) {
                 user.getProfile().setProfileImage(dto.profileImage());
             } else {
@@ -117,6 +123,5 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUserName(userName)
                 .map(userMapper::userEntityToUserResponseDto);
     }
-
 
 }
