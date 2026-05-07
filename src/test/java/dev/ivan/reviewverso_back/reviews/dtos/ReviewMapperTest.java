@@ -149,4 +149,23 @@ class ReviewMapperTest {
         assertEquals("Me encantó la trama y los personajes.", entity.getReviewText());
         assertEquals(4.0, entity.getRating());
     }
+
+    @Test
+    void testReviewEntityToReviewResponseDTO_withCloudinaryURL() {
+        ProfileEntity profile = new ProfileEntity();
+        String cloudinaryUrl = "https://res.cloudinary.com/demo/image/upload/sample.jpg";
+        profile.setProfileImage(cloudinaryUrl);
+        UserEntity user = UserEntity.builder()
+                .idUser(1L)
+                .userName("testuser")
+                .profile(profile)
+                .build();
+        ReviewEntity review = ReviewEntity.builder()
+                .idReview(10L)
+                .user(user)
+                .build();
+
+        ReviewResponseDTO dto = reviewMapper.reviewEntityToReviewResponseDTO(review);
+        assertEquals(cloudinaryUrl, dto.userProfileImageUrl());
+    }
 }

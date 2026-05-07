@@ -53,7 +53,7 @@ class ListControllerTest {
         ListItemResponseDTO itemResponseDTO = new ListItemResponseDTO(
                 1L, ContentType.MOVIE, "550", ApiSource.TMDB, 0);
         ListResponseDTO response = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", "http://test.com/image.png",
                 "Mi Lista de Películas",
                 "Mis películas favoritas de todos los tiempos",
                 List.of(itemResponseDTO),
@@ -88,7 +88,7 @@ class ListControllerTest {
                 2L, ContentType.SERIES, "1399", ApiSource.TMDB, 1);
 
         ListResponseDTO list1 = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", null,
                 "Películas Acción",
                 "Mis películas de acción favoritas",
                 List.of(item1),
@@ -97,7 +97,7 @@ class ListControllerTest {
         );
 
         ListResponseDTO list2 = new ListResponseDTO(
-                2L, 1L, "testuser",
+                2L, 1L, "testuser", null,
                 "Series para ver",
                 "Series pendientes",
                 List.of(item2),
@@ -126,7 +126,7 @@ class ListControllerTest {
                 1L, ContentType.GAME, "1234", ApiSource.IGDB, 0);
 
         ListResponseDTO response = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", null,
                 "Juegos Indie",
                 "Mis juegos indie favoritos",
                 List.of(item),
@@ -150,7 +150,7 @@ class ListControllerTest {
     @DisplayName("GET /lists/user/{userId} retorna listas del usuario")
     void getListsByUser_returnsList() throws Exception {
         ListResponseDTO list1 = new ListResponseDTO(
-                1L, 2L, "otheruser",
+                1L, 2L, "otheruser", null,
                 "Mi Lista 1",
                 "Descripción 1",
                 new ArrayList<>(),
@@ -159,7 +159,7 @@ class ListControllerTest {
         );
 
         ListResponseDTO list2 = new ListResponseDTO(
-                2L, 2L, "otheruser",
+                2L, 2L, "otheruser", null,
                 "Mi Lista 2",
                 "Descripción 2",
                 new ArrayList<>(),
@@ -192,7 +192,7 @@ class ListControllerTest {
         ListItemResponseDTO itemResponse = new ListItemResponseDTO(
                 1L, ContentType.BOOK, "abc123", ApiSource.OPENLIBRARY, 0);
         ListResponseDTO response = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", null,
                 "Lista Actualizada",
                 "Descripción actualizada",
                 List.of(itemResponse),
@@ -235,7 +235,7 @@ class ListControllerTest {
         );
 
         ListResponseDTO response = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", null,
                 "Lista Vacía",
                 "Sin items todavía",
                 new ArrayList<>(),
@@ -276,7 +276,7 @@ class ListControllerTest {
         ListItemResponseDTO respItem4 = new ListItemResponseDTO(4L, ContentType.BOOK, "abc", ApiSource.OPENLIBRARY, 3);
 
         ListResponseDTO response = new ListResponseDTO(
-                1L, 1L, "testuser",
+                1L, 1L, "testuser", null,
                 "Contenido Mixto",
                 "Una lista con todo tipo de contenido",
                 List.of(respItem1, respItem2, respItem3, respItem4),

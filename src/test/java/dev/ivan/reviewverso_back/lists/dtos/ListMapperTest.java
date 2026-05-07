@@ -7,6 +7,7 @@ import dev.ivan.reviewverso_back.reviews.enums.ContentType;
 import dev.ivan.reviewverso_back.user.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,10 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class ListMapperTest {
 
     private ListMapper listMapper;
+    private final String BASE_URL = "http://test-url";
 
     @BeforeEach
     void setUp() {
         listMapper = new ListMapper();
+        ReflectionTestUtils.setField(listMapper, "baseUrl", BASE_URL);
     }
 
     @Test
@@ -145,6 +148,7 @@ class ListMapperTest {
         assertEquals(10L, dto.idList());
         assertEquals(1L, dto.userId());
         assertEquals("testuser", dto.userName());
+        assertEquals(BASE_URL + "/api/v1/files/images/default.png", dto.userProfileImageUrl());
         assertEquals("Mi Lista", dto.title());
         assertEquals("Descripción de la lista", dto.description());
         assertEquals(2, dto.items().size());
@@ -187,6 +191,7 @@ class ListMapperTest {
         assertEquals(20L, dto.idList());
         assertEquals(5L, dto.userId());
         assertEquals("user5", dto.userName());
+        assertEquals(BASE_URL + "/api/v1/files/images/default.png", dto.userProfileImageUrl());
         assertEquals("Lista Sin Items", dto.title());
         assertNotNull(dto.items());
         assertTrue(dto.items().isEmpty());

@@ -89,6 +89,7 @@ class ListServiceImplTest {
                 1L,
                 1L,
                 "testuser",
+                null,
                 "Mi Lista",
                 "Descripción de prueba",
                 List.of(itemResponseDTO),
