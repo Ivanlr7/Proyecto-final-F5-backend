@@ -3,6 +3,7 @@ package dev.ivan.reviewverso_back.lists.dtos;
 import dev.ivan.reviewverso_back.lists.ListEntity;
 import dev.ivan.reviewverso_back.lists.ListItemEntity;
 import dev.ivan.reviewverso_back.user.UserEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,6 +12,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class ListMapper {
+    
+    @Value("${base-url}")
+    private String baseUrl;
 
     public ListEntity listRequestDtoToListEntity(ListRequestDTO dto, UserEntity user) {
         ListEntity list = ListEntity.builder()
@@ -42,10 +46,28 @@ public class ListMapper {
                 .map(this::listItemEntityToDto)
                 .collect(Collectors.toList());
 
+        String profileImageUrl;
+        String imagePath = "/api/v1/files/images/";
+        if (list.getUser() != null && list.getUser().getProfile() != null) {
+            String profileImage = list.getUser().getProfile().getProfileImage();
+            if (profileImage != null && !profileImage.isBlank()) {
+                if (profileImage.startsWith("http")) {
+                    profileImageUrl = profileImage;
+                } else {
+                    profileImageUrl = baseUrl + imagePath + profileImage;
+                }
+            } else {
+                profileImageUrl = baseUrl + imagePath + "default.png";
+            }
+        } else {
+            profileImageUrl = baseUrl + imagePath + "default.png";
+        }
+
         return new ListResponseDTO(
                 list.getIdList(),
                 list.getUser().getIdUser(),
                 list.getUser().getUserName(),
+                profileImageUrl,
                 list.getTitle(),
                 list.getDescription(),
                 itemDtos,

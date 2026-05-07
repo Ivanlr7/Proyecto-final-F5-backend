@@ -7,6 +7,7 @@ public record ListResponseDTO(
     Long idList,
     Long userId,
     String userName,
+    String userProfileImageUrl,
     String title,
     String description,
     List<ListItemResponseDTO> items,

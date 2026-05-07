@@ -20,9 +20,13 @@ public class ReviewMapper {
         String profileImageUrl;
         String imagePath = "/api/v1/files/images/";
         if (review.getUser() != null && review.getUser().getProfile() != null) {
-            String fileName = review.getUser().getProfile().getProfileImage();
-            if (fileName != null && !fileName.isBlank()) {
-                profileImageUrl = baseUrl + imagePath + fileName;
+            String profileImage = review.getUser().getProfile().getProfileImage();
+            if (profileImage != null && !profileImage.isBlank()) {
+                if (profileImage.startsWith("http")) {
+                    profileImageUrl = profileImage;
+                } else {
+                    profileImageUrl = baseUrl + imagePath + profileImage;
+                }
             } else {
                 profileImageUrl = baseUrl + imagePath + "default.png";
             }
