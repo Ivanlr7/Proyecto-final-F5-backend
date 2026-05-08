@@ -6,6 +6,7 @@ import dev.ivan.reviewverso_back.user.dtos.UserRequestDTO;
 import dev.ivan.reviewverso_back.user.dtos.UserResponseDTO;
 import dev.ivan.reviewverso_back.user.dtos.UserMapper;
 import dev.ivan.reviewverso_back.user.exceptions.UserNotFoundException;
+import dev.ivan.reviewverso_back.user.exceptions.UserIllegalArgumentException;
 import dev.ivan.reviewverso_back.role.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,8 +48,21 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con id: " + id));
 
-        if (dto.userName() != null) user.setUserName(dto.userName());
-        if (dto.email() != null) user.setEmail(dto.email());
+        // Validar userName único (solo si se intenta cambiar)
+        if (dto.userName() != null && !dto.userName().equals(user.getUserName())) {
+            if (userRepository.findByUserName(dto.userName()).isPresent()) {
+                throw new UserIllegalArgumentException("El nombre de usuario ya está registrado");
+            }
+            user.setUserName(dto.userName());
+        }
+
+        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
+            if (userRepository.findByEmail(dto.email()).isPresent()) {
+                throw new UserIllegalArgumentException("El email ya está registrado");
+            }
+            user.setEmail(dto.email());
+        }
+
         if (dto.password() != null) user.setPassword(dto.password());
 
         if (profileImage != null && !profileImage.isEmpty()) {
