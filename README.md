@@ -261,23 +261,23 @@ The API is available at `http://localhost:8080/api/v1` with the following endpoi
 
 ```mermaid
 erDiagram
-    USER ||--o{ REVIEW : "crea"
-    USER ||--o{ LIST : "posee"
-    USER ||--|| PROFILE : "tiene"
-    USER }o--o{ ROLE : "tiene roles"
-    USER }o--o{ REVIEW : "le gusta"
+    USER ||--o{ REVIEW : "creates"
+    USER ||--o{ LIST : "owns"
+    USER ||--|| PROFILE : "has"
+    USER }o--o{ ROLE : "has roles"
+    USER }o--o{ REVIEW : "likes"
     
-    REVIEW }o--|| USER : "creada por"
-    REVIEW }o--o{ USER : "gustada por"
+    REVIEW }o--|| USER : "created by"
+    REVIEW }o--o{ USER : "liked by"
     
-    LIST }o--|| USER : "pertenece a"
-    LIST ||--o{ LIST_ITEM : "contiene"
+    LIST }o--|| USER : "belongs to"
+    LIST ||--o{ LIST_ITEM : "contains"
     
-    LIST_ITEM }o--|| LIST : "forma parte de"
+    LIST_ITEM }o--|| LIST : "is part of"
     
-    PROFILE ||--|| USER : "pertenece a"
+    PROFILE ||--|| USER : "belongs to"
     
-    ROLE }o--o{ USER : "asignado a"
+    ROLE }o--o{ USER : "assigned to"
 
     USER {
         Long id_user PK
@@ -409,7 +409,7 @@ classDiagram
         OPENLIBRARY
     }
     
-    %% Relaciones entre Entidades
+    %% Entity Relationships
     UserEntity "1" --o "0..*" ReviewEntity : reviews
     UserEntity "1" --o "0..*" ListEntity : lists
     UserEntity "1" -- "1" ProfileEntity : profile
